@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- 결과 표시창 -->
+    <TextView
+        android:id="@+id/resultTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textSize="36sp"
+        android:gravity="end"
+        android:padding="16dp"
+        android:background="#EEEEEE"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 버튼들은 GridLayout을 써서 구성해보자 -->
+    <GridLayout
+        android:id="@+id/buttonGrid"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:rowCount="5"
+        android:columnCount="4"
+        app:layout_constraintTop_toBottomOf="@id/resultTextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 숫자 및 연산자 버튼들 -->
+        <Button android:id="@+id/button7" android:text="7" style="@style/CalcButton"/>
+        <Button android:id="@+id/button8" android:text="8" style="@style/CalcButton"/>
+        <Button android:id="@+id/button9" android:text="9" style="@style/CalcButton"/>
+        <Button android:id="@+id/buttonDivide" android:text="÷" style="@style/CalcButton"/>
+
+        <Button android:id="@+id/button4" android:text="4" style="@style/CalcButton"/>
+        <Button android:id="@+id/button5" android:text="5" style="@style/CalcButton"/>
+        <Button android:id="@+id/button6" android:text="6" style="@style/CalcButton"/>
+        <Button android:id="@+id/buttonMultiply" android:text="×" style="@style/CalcButton"/>
+
+        <Button android:id="@+id/button1" android:text="1" style="@style/CalcButton"/>
+        <Button android:id="@+id/button2" android:text="2" style="@style/CalcButton"/>
+        <Button android:id="@+id/button3" android:text="3" style="@style/CalcButton"/>
+        <Button android:id="@+id/buttonSubtract" android:text="-" style="@style/CalcButton"/>
+
+        <Button android:id="@+id/button0" android:text="0" style="@style/CalcButton"/>
+        <Button android:id="@+id/buttonDot" android:text="." style="@style/CalcButton"/>
+        <Button android:id="@+id/buttonEquals" android:text="=" style="@style/CalcButton"/>
+        <Button android:id="@+id/buttonAdd" android:text="+" style="@style/CalcButton"/>
+    </GridLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
