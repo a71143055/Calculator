@@ -5,14 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFF0D5"
-    android:padding="16dp">
+    android:background="#FFF0D5">
 
     <!-- 결과 표시창 -->
     <TextView
         android:id="@+id/resultTextView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="250dp"
         android:text="입력하시오"
         android:textSize="36sp"
         android:gravity="end"
@@ -22,14 +21,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 버튼들은 GridLayout을 써서 구성해보자 -->
+
     <LinearLayout
         android:id="@+id/buttonGrid"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="395dp"
+        android:background="#FF7700"
         android:rowCount="5"
         android:columnCount="4"
+
         app:layout_constraintTop_toBottomOf="@id/resultTextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
