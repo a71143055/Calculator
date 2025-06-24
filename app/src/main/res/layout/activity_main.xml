@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="#FFF0D5"
     android:padding="16dp">
 
     <!-- 결과 표시창 -->
     <TextView
         android:id="@+id/resultTextView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="입력하시오"
         android:textSize="36sp"
@@ -22,7 +23,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 버튼들은 GridLayout을 써서 구성해보자 -->
-    <GridLayout
+    <LinearLayout
         android:id="@+id/buttonGrid"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -54,6 +55,6 @@
         <Button android:id="@+id/buttonDot" android:text="." style="@style/CalcButton"/>
         <Button android:id="@+id/buttonEquals" android:text="=" style="@style/CalcButton"/>
         <Button android:id="@+id/buttonAdd" android:text="+" style="@style/CalcButton"/>
-    </GridLayout>
+    </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
