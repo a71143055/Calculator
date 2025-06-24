@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFF0D5"
     android:padding="16dp">
 
     <!-- 결과 표시창 -->
@@ -11,11 +12,11 @@
         android:id="@+id/resultTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="0"
+        android:text="입력하시오"
         android:textSize="36sp"
         android:gravity="end"
         android:padding="16dp"
-        android:background="#EEEEEE"
+        android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
