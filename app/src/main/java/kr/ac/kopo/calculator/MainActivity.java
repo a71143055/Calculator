@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
     private final StringBuilder inputExpression = new StringBuilder();
     private TextView calcTextView;
+    private TextView resultTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             inputExpression.append(buttonText);
         } else if (id == R.id.buttonEquals) {
             String result = calculateExpression(inputExpression.toString());
-            calcTextView.setText(result);
+            resultTextView.setText(result);
             inputExpression.setLength(0);
         } else if (id == R.id.buttonBackspace) {
             if (inputExpression.length() > 0) {
