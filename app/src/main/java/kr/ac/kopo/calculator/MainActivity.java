@@ -7,12 +7,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-
+    private StringBuilder inputExpression = new StringBuilder();
     private TextView calcTextView;
     private TextView resultTextView;
-    private String currentInput = "";
-    private Double firstOperand = null;
-    private String operator = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,12 +21,12 @@ public class MainActivity extends AppCompatActivity {
         int[] buttonIds = {
                 R.id.button0, R.id.button1, R.id.button2, R.id.button3,
                 R.id.button4, R.id.button5, R.id.button6, R.id.button7,
-                R.id.button8, R.id.button9, R.id.buttonDot, R.id.buttonColon,
+                R.id.button8, R.id.button9, R.id.buttonDot, R.id.buttonAdd,
                 R.id.buttonSubtract, R.id.buttonMultiply, R.id.buttonDivide,
                 R.id.buttonEquals, R.id.buttonComma, R.id.buttonBackspace,
                 R.id.buttonPipe, R.id.buttonRecord, R.id.buttonAnd,
                 R.id.buttonSquareBrackets, R.id.buttonPercent, R.id.buttonBrace,
-                R.id.buttonAdd, R.id.buttonPi, R.id.buttonParentheses
+                R.id.buttonPi, R.id.buttonParentheses
         };
 
         for (int id : buttonIds) {
@@ -38,35 +35,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void onButtonClick(View v) {
-        Button button = (Button) v;
-        String value = button.getText().toString();
+    public void onButtonClick(View v) {
+        Button b = (Button) v;
+        String buttonText = b.getText().toString();
 
-        switch (value) {
-            case "+":
-            case "-":
-            case "×":
-            case "÷":
-                if (!currentInput.isEmpty()) {
-                    firstOperand = Double.parseDouble(currentInput);
-                    operator = value;
-                    currentInput = "";
-                }
-                break;
-            case "=":
-                if (operator != null && !currentInput.isEmpty()) {
-                    double secondOperand = Double.parseDouble(currentInput);
-                    double result = calculate(firstOperand, secondOperand, operator);
-                    resultTextView.setText(String.valueOf(result));
-                    currentInput = "";
-                    operator = null;
-                    firstOperand = null;
-                }
-                break;
-            default:
-                currentInput += value;
-                calcTextView.setText(currentInput);
+        int id = v.getId();
+
+        if (id == R.id.buttonAdd || id == R.id.buttonSubtract ||
+                id == R.id.buttonMultiply || id == R.id.buttonDivide) {
+
+            inputExpression.append(buttonText);
+
+        } else if (id == R.id.buttonEquals) {
+
+            String result = calculateExpression(inputExpression.toString());
+            calcTextView.setText(result);
+            inputExpression.setLength(0);
+
+        } else {
+            inputExpression.append(buttonText);
         }
+
+        calcTextView.setText(inputExpression.toString());
+
     }
 
     private double calculate(double a, double b, String op) {
@@ -78,4 +69,38 @@ public class MainActivity extends AppCompatActivity {
             default: return 0;
         }
     }
+
+    private String calculateExpression(String expression) {
+        try {
+            // 단순 예제: 연산자 하나만 있는 경우 처리
+            String[] parts;
+            double a, b;
+            if (expression.contains("+")) {
+                parts = expression.split("\\+");
+                a = Double.parseDouble(parts[0]);
+                b = Double.parseDouble(parts[1]);
+                return String.valueOf(calculate(a, b, "+"));
+            } else if (expression.contains("-")) {
+                parts = expression.split("-");
+                a = Double.parseDouble(parts[0]);
+                b = Double.parseDouble(parts[1]);
+                return String.valueOf(calculate(a, b, "-"));
+            } else if (expression.contains("×")) {
+                parts = expression.split("×");
+                a = Double.parseDouble(parts[0]);
+                b = Double.parseDouble(parts[1]);
+                return String.valueOf(calculate(a, b, "×"));
+            } else if (expression.contains("÷")) {
+                parts = expression.split("÷");
+                a = Double.parseDouble(parts[0]);
+                b = Double.parseDouble(parts[1]);
+                return String.valueOf(calculate(a, b, "÷"));
+            } else {
+                return "계산 불가";
+            }
+        } catch (Exception e) {
+            return "오류";
+        }
+    }
+
 }
