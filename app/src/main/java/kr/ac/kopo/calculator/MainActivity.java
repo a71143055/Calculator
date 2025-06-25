@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         calcTextView = findViewById(R.id.calcTextView);
+        resultTextView = findViewById(R.id.resultTextView);
 
         int[] buttonIds = {
                 R.id.button0, R.id.button1, R.id.button2, R.id.button3,
