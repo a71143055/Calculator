@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    private TextView calcTextView;
     private TextView resultTextView;
     private String currentInput = "";
     private Double firstOperand = null;
@@ -18,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        resultTextView = findViewById(R.id.resultTextView);
+        calcTextView = findViewById(R.id.calcTextView);
 
         int[] buttonIds = {
                 R.id.button0, R.id.button1, R.id.button2, R.id.button3,
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             default:
                 currentInput += value;
-                resultTextView.setText(currentInput);
+                calcTextView.setText(currentInput);
         }
     }
 
