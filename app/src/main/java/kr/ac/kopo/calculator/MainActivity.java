@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             inputExpression.append(buttonText);
         }
-        calcTextView.setText(calcTextView.getText().toString() + inputExpression.toString());
+        calcTextView.setText(inputExpression.toString());
     }
 
     private double calculate(double a, double b, String op) {
