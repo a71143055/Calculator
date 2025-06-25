@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
                 R.id.buttonEquals, R.id.buttonComma, R.id.buttonBackspace,
                 R.id.buttonPipe, R.id.buttonRecord, R.id.buttonAnd,
                 R.id.buttonSquareBrackets, R.id.buttonPercent, R.id.buttonBrace,
-                R.id.buttonPi, R.id.buttonParentheses
+                R.id.buttonPi, R.id.buttonParentheses, R.id.buttonColon
         };
 
         for (int id : buttonIds) {
