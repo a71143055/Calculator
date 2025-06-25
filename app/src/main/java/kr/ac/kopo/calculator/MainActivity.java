@@ -38,26 +38,24 @@ public class MainActivity extends AppCompatActivity {
     public void onButtonClick(View v) {
         Button b = (Button) v;
         String buttonText = b.getText().toString();
-
         int id = v.getId();
 
         if (id == R.id.buttonAdd || id == R.id.buttonSubtract ||
                 id == R.id.buttonMultiply || id == R.id.buttonDivide) {
-
             inputExpression.append(buttonText);
-
         } else if (id == R.id.buttonEquals) {
-
             String result = calculateExpression(inputExpression.toString());
-            calcTextView.setText(result);
+            resultTextView.setText(result);
             inputExpression.setLength(0);
-
+        } else if (id == R.id.buttonBackspace) {
+            if (inputExpression.length() > 0) {
+                inputExpression.deleteCharAt(inputExpression.length() - 1);
+            }
         } else {
             inputExpression.append(buttonText);
         }
 
-        calcTextView.setText(inputExpression.toString());
-
+        resultTextView.setText(inputExpression.toString());
     }
 
     private double calculate(double a, double b, String op) {
@@ -102,5 +100,4 @@ public class MainActivity extends AppCompatActivity {
             return "오류";
         }
     }
-
 }
