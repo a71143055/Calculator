@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private StringBuilder inputExpression = new StringBuilder();
+    private final StringBuilder inputExpression = new StringBuilder();
     private TextView calcTextView;
     private TextView resultTextView;
 
