@@ -43,10 +43,12 @@ public class MainActivity extends AppCompatActivity {
         buttonBackspace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String currentText = calcTextView.getText().toString();
-                if (!currentText.isEmpty()) {
-                    // 마지막 문자 제거
-                    calcTextView.setText(currentText.substring(0, currentText.length() - 1));
+                if (inputExpression.length() > 0) {
+                    // 입력값에서 마지막 문자 삭제
+                    inputExpression.deleteCharAt(inputExpression.length() - 1);
+
+                    // 화면에 표시된 텍스트도 업데이트
+                    calcTextView.setText(inputExpression.toString());
                 }
             }
         });
