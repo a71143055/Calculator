@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="#FBCAA2" />
+    <corners android:radius="999dp" /> <!-- 완전한 원 형태 -->
+</shape>
