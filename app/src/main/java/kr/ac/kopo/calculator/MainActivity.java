@@ -10,6 +10,7 @@ public class MainActivity extends AppCompatActivity {
     private final StringBuilder inputExpression = new StringBuilder();
     private TextView calcTextView;
     private TextView resultTextView;
+    private Button buttonBackspace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
         calcTextView = findViewById(R.id.calcTextView);
         resultTextView = findViewById(R.id.resultTextView);
+        buttonBackspace = findViewById(R.id.buttonBackspace);
 
         int[] buttonIds = {
                 R.id.button0, R.id.button1, R.id.button2, R.id.button3,
@@ -37,6 +39,17 @@ public class MainActivity extends AppCompatActivity {
                 btn.setOnClickListener(this::onButtonClick);
             }
         }
+
+        buttonBackspace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String currentText = calcTextView.getText().toString();
+                if (!currentText.isEmpty()) {
+                    // 마지막 문자 제거
+                    calcTextView.setText(currentText.substring(0, currentText.length() - 1));
+                }
+            }
+        });
     }
 
     public void onButtonClick(View v) {
@@ -67,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
         switch (op) {
             case "+": return a + b;
             case "-": return a - b;
-            case "×": return a * b;
-            case "÷": return b != 0 ? a / b : Double.NaN;
+            case "*": return a * b;
+            case "/": return b != 0 ? a / b : Double.NaN;
             default: return 0;
         }
     }
@@ -88,16 +101,16 @@ public class MainActivity extends AppCompatActivity {
                 a = Double.parseDouble(parts[0]);
                 b = Double.parseDouble(parts[1]);
                 return String.valueOf(calculate(a, b, "-"));
-            } else if (expression.contains("×")) {
-                parts = expression.split("×");
+            } else if (expression.contains("*")) {
+                parts = expression.split("\\*");
                 a = Double.parseDouble(parts[0]);
                 b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "×"));
-            } else if (expression.contains("÷")) {
-                parts = expression.split("÷");
+                return String.valueOf(calculate(a, b, "*"));
+            } else if (expression.contains("/")) {
+                parts = expression.split("/");
                 a = Double.parseDouble(parts[0]);
                 b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "÷"));
+                return String.valueOf(calculate(a, b, "/"));
             } else {
                 return "계산 불가";
             }
