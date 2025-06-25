@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         int[] buttonIds = {
                 R.id.button0, R.id.button1, R.id.button2, R.id.button3,
                 R.id.button4, R.id.button5, R.id.button6, R.id.button7,
-                R.id.button8, R.id.button9, R.id.buttonDot, R.id.buttonAdd,
+                R.id.button8, R.id.button9, R.id.buttonDot, R.id.buttonColon,
                 R.id.buttonSubtract, R.id.buttonMultiply, R.id.buttonDivide,
                 R.id.buttonEquals, R.id.buttonComma, R.id.buttonBackspace,
                 R.id.buttonPipe, R.id.buttonRecord, R.id.buttonAnd,
