@@ -29,8 +29,11 @@ public class MainActivity extends AppCompatActivity {
         };
 
         for (int id : buttonIds) {
-            Button btn = findViewById(id);
-            btn.setOnClickListener(this::onButtonClick);
+            if (id != R.id.buttonBackspace && id != R.id.buttonRecord &&
+            id != R.id.buttonPi) {
+                Button btn = findViewById(id);
+                btn.setOnClickListener(this::onButtonClick);
+            }
         }
     }
 
@@ -53,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             inputExpression.append(buttonText);
         }
-
         calcTextView.setText(inputExpression.toString());
     }
 
