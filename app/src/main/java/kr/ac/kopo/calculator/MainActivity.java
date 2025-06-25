@@ -83,7 +83,18 @@ public class MainActivity extends AppCompatActivity {
             case "+": return a + b;
             case "-": return a - b;
             case "*": return a * b;
+            case "**": return Math.pow(a, b);
             case "/": return b != 0 ? a / b : Double.NaN;
+            default: return 0;
+        }
+    }
+
+    private int calculate(int a, int b, String op) {
+        switch (op) {
+            case "//": if (b != 0) {
+                return a / b;
+            }
+            case "%": return a % b;
             default: return 0;
         }
     }
@@ -108,11 +119,26 @@ public class MainActivity extends AppCompatActivity {
                 a = Double.parseDouble(parts[0]);
                 b = Double.parseDouble(parts[1]);
                 return String.valueOf(calculate(a, b, "*"));
+            } else if (expression.contains("**")) {
+                parts = expression.split("\\*\\*");
+                a = Double.parseDouble(parts[0]);
+                b = Double.parseDouble(parts[1]);
+                return String.valueOf(calculate(a, b, "**"));
             } else if (expression.contains("/")) {
                 parts = expression.split("/");
                 a = Double.parseDouble(parts[0]);
                 b = Double.parseDouble(parts[1]);
                 return String.valueOf(calculate(a, b, "/"));
+            } else if (expression.contains("//")) {
+                parts = expression.split("/");
+                a = Integer.parseInt(parts[0]);
+                b = Integer.parseInt(parts[1]);
+                return String.valueOf(calculate(a, b, "//"));
+            } else if (expression.contains("%")) {
+                parts = expression.split("%");
+                a = Integer.parseInt(parts[0]);
+                b = Integer.parseInt(parts[1]);
+                return String.valueOf(calculate(a, b, "%"));
             } else {
                 return "계산 불가";
             }
