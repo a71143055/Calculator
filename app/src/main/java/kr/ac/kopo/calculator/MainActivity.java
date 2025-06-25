@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
     private final StringBuilder inputExpression = new StringBuilder();
     private TextView calcTextView;
-    private TextView resultTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             inputExpression.append(buttonText);
         } else if (id == R.id.buttonEquals) {
             String result = calculateExpression(inputExpression.toString());
-            resultTextView.setText(result);
+            calcTextView.setText(result);
             inputExpression.setLength(0);
         } else if (id == R.id.buttonBackspace) {
             if (inputExpression.length() > 0) {
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             inputExpression.append(buttonText);
         }
 
-        resultTextView.setText(inputExpression.toString());
+        calcTextView.setText(inputExpression.toString());
     }
 
     private double calculate(double a, double b, String op) {
@@ -70,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
 
     private String calculateExpression(String expression) {
         try {
-            // 단순 예제: 연산자 하나만 있는 경우 처리
             String[] parts;
             double a, b;
+
             if (expression.contains("+")) {
                 parts = expression.split("\\+");
                 a = Double.parseDouble(parts[0]);
