@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
             inputExpression.append(buttonText);
         } else if (id == R.id.buttonEquals) {
             String result = calculateExpression(inputExpression.toString());
+            calcTextView.setText(inputExpression.toString());
             resultTextView.setText(result);
             inputExpression.setLength(0);
         } else if (id == R.id.buttonBackspace) {
