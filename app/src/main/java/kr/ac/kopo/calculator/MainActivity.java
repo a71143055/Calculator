@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 b = Double.parseDouble(parts[1]);
                 return String.valueOf(calculate(a, b, "/"));
             } else if (expression.contains("//")) {
-                parts = expression.split("/");
+                parts = expression.split("//");
                 a = Integer.parseInt(parts[0]);
                 b = Integer.parseInt(parts[1]);
                 return String.valueOf(calculate(a, b, "//"));
