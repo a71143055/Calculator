@@ -47,22 +47,18 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.buttonAdd || id == R.id.buttonSubtract ||
                 id == R.id.buttonMultiply || id == R.id.buttonDivide) {
             inputExpression.append(buttonText);
-            calcTextView.setText(inputExpression.toString());
         } else if (id == R.id.buttonEquals) {
             String result = calculateExpression(inputExpression.toString());
             resultTextView.setText(result);
             inputExpression.setLength(0);
-            calcTextView.setText(inputExpression.toString());
         } else if (id == R.id.buttonBackspace) {
             if (inputExpression.length() > 0) {
                 inputExpression.deleteCharAt(inputExpression.length() - 1);
             }
-            calcTextView.setText(inputExpression.toString());
         } else {
             inputExpression.append(buttonText);
-            calcTextView.setText(inputExpression.toString());
         }
-        calcTextView.setText(inputExpression.toString());
+        calcTextView.setText(calcTextView.getText().toString() + inputExpression.toString());
     }
 
     private double calculate(double a, double b, String op) {
