@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
             case "*": return a * b;
             case "**": return Math.pow(a, b);
             case "/": return b != 0 ? a / b : Double.NaN;
+            case "//": return b != 0 ? (int)a / (int)b : Double.NaN;
             default: return 0;
         }
     }
