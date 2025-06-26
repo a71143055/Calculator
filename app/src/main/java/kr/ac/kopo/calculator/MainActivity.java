@@ -145,6 +145,13 @@ public class MainActivity extends AppCompatActivity {
 
             double[][] A = parseMatrix(parts[0].trim());
 
+            if (A.length == 1) {
+                // 가로 벡터: A[0]을 double[]로 사용
+                double[] vectorA = A[0];
+                // 벡터 연산 수행
+            }
+
+
             // 스칼라 나눗셈
             if (operator.equals("/")) {
                 double scalar = Double.parseDouble(parts[1].trim());
@@ -158,7 +165,14 @@ public class MainActivity extends AppCompatActivity {
                 return Arrays.deepToString(result);
             }
 
-            double[][] B = parseMatrix(parts[1].trim());
+            double[][] B = parseMatrix(parts[0].trim());
+
+            if (B.length == 1) {
+                // 가로 벡터: A[0]을 double[]로 사용
+                double[] vectorA = B[0];
+                // 벡터 연산 수행
+            }
+
 
             // 1차원 벡터 연산 감지
             boolean isVector = A.length == 1 && B.length == 1 && A[0].length == B[0].length;
