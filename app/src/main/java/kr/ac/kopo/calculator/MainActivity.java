@@ -126,13 +126,13 @@ public class MainActivity extends AppCompatActivity {
                 return String.valueOf(calculate(a, b, "*"));
             } else if (expression.contains("//")) {
                 parts = expression.split("//");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
+                a = Integer.parseInt(parts[0]);
+                b = Integer.parseInt(parts[1]);
                 return String.valueOf(calculate(a, b, "//"));
             } else if (expression.contains("/")) {
                 parts = expression.split("/");
-                a = Integer.parseInt(parts[0]);
-                b = Integer.parseInt(parts[1]);
+                a = Double.parseDouble(parts[0]);
+                b = Double.parseDouble(parts[1]);
                 return String.valueOf(calculate(a, b, "/"));
             } else if (expression.contains("%")) {
                 parts = expression.split("%");
