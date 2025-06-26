@@ -40,25 +40,15 @@ public class MainActivity extends AppCompatActivity {
             id != R.id.buttonPi && id != R.id.buttonSquareBrackets && id != R.id.buttonParentheses && id != R.id.buttonBrace) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(this::onButtonClick);
-            }
-            else if (id == R.id.buttonSquareBrackets || id == R.id.buttonParentheses || id == R.id.buttonBrace) {
+            }else if (id == R.id.buttonSquareBrackets) {
                 Button btn = findViewById(id);
-                btn.setOnClickListener(v -> {
-                    String label = ((Button) v).getText().toString().trim();
-
-                    // 괄호 쌍에서 왼쪽 괄호만 꺼내기
-                    switch (label) {
-                        case "( )":
-                            insertSymbol("("); // 또는 ")"로 바꿔도 돼요
-                            break;
-                        case "{ }":
-                            insertSymbol("{");
-                            break;
-                        case "[ ]":
-                            insertSymbol("[");
-                            break;
-                    }
-                });
+                btn.setOnClickListener(v -> insertSymbol("[")); // 또는 "]"
+            } else if (id == R.id.buttonParentheses) {
+                Button btn = findViewById(id);
+                btn.setOnClickListener(v -> insertSymbol("(")); // 또는 ")"
+            } else if (id == R.id.buttonBrace) {
+                Button btn = findViewById(id);
+                btn.setOnClickListener(v -> insertSymbol("{")); // 또는 "}"
             }
         }
 
