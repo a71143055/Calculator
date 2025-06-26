@@ -143,79 +143,76 @@ public class MainActivity extends AppCompatActivity {
             String[] parts = expr.split(Pattern.quote(operator));
             if (parts.length != 2) return "잘못된 형식";
 
-            double[][] A = parseMatrix(parts[0].trim());
-
-            if (A.length == 1) {
-                // 가로 벡터: A[0]을 double[]로 사용
-                double[] vectorA = A[0];
-                // 벡터 연산 수행
-            }
-
+            Object parsedA = parseMatrixDynamic(parts[0].trim());
+            Object parsedB = operator.equals("/") ? null : parseMatrixDynamic(parts[1].trim());
 
             // 스칼라 나눗셈
             if (operator.equals("/")) {
                 double scalar = Double.parseDouble(parts[1].trim());
                 if (scalar == 0) return "0으로 나눌 수 없음";
 
-                double[][] result = new double[A.length][A[0].length];
-                for (int i = 0; i < A.length; i++)
-                    for (int j = 0; j < A[0].length; j++)
-                        result[i][j] = A[i][j] / scalar;
-
-                return Arrays.deepToString(result);
-            }
-
-            double[][] B = parseMatrix(parts[0].trim());
-
-            if (B.length == 1) {
-                // 가로 벡터: A[0]을 double[]로 사용
-                double[] vectorA = B[0];
-                // 벡터 연산 수행
-            }
-
-
-            // 1차원 벡터 연산 감지
-            boolean isVector = A.length == 1 && B.length == 1 && A[0].length == B[0].length;
-
-            switch (operator) {
-                case "+":
-                case "-":
-                    if (isVector) {
-                        double[] result = new double[A[0].length];
-                        for (int i = 0; i < result.length; i++) {
-                            result[i] = operator.equals("+") ? A[0][i] + B[0][i] : A[0][i] - B[0][i];
-                        }
-                        return Arrays.toString(result);
-                    } else if (A.length == B.length && A[0].length == B[0].length) {
-                        double[][] result = new double[A.length][A[0].length];
-                        for (int i = 0; i < A.length; i++)
-                            for (int j = 0; j < A[0].length; j++)
-                                result[i][j] = operator.equals("+") ? A[i][j] + B[i][j] : A[i][j] - B[i][j];
-                        return Arrays.deepToString(result);
-                    } else {
-                        return "크기 불일치";
+                if (parsedA instanceof double[]) {
+                    double[] A = (double[]) parsedA;
+                    double[] result = new double[A.length];
+                    for (int i = 0; i < A.length; i++) {
+                        result[i] = A[i] / scalar;
                     }
-
-                case "*":
-                    if (isVector) {
-                        double sum = 0;
-                        for (int i = 0; i < A[0].length; i++) {
-                            sum += A[0][i] * B[0][i];
-                        }
-                        return String.valueOf(sum); // 내적 결과
-                    } else if (A[0].length == B.length) {
-                        double[][] result = new double[A.length][B[0].length];
-                        for (int i = 0; i < A.length; i++)
-                            for (int j = 0; j < B[0].length; j++)
-                                for (int k = 0; k < A[0].length; k++)
-                                    result[i][j] += A[i][k] * B[k][j];
-                        return Arrays.deepToString(result);
-                    } else {
-                        return "곱셈 불가능";
-                    }
+                    return Arrays.toString(result);
+                } else if (parsedA instanceof double[][]) {
+                    double[][] A = (double[][]) parsedA;
+                    double[][] result = new double[A.length][A[0].length];
+                    for (int i = 0; i < A.length; i++)
+                        for (int j = 0; j < A[0].length; j++)
+                            result[i][j] = A[i][j] / scalar;
+                    return Arrays.deepToString(result);
+                } else {
+                    return "지원하지 않는 형식";
+                }
             }
 
-            return "알 수 없는 연산";
+            // 벡터 연산: double[] + double[]
+            if (parsedA instanceof double[] && parsedB instanceof double[]) {
+                double[] A = (double[]) parsedA;
+                double[] B = (double[]) parsedB;
+                if (A.length != B.length) return "크기 불일치";
+                double[] result = new double[A.length];
+                for (int i = 0; i < A.length; i++) {
+                    result[i] = operator.equals("+") ? A[i] + B[i] :
+                            operator.equals("-") ? A[i] - B[i] : A[i] * B[i]; // 내적 제외
+                }
+                if (operator.equals("*")) {
+                    double dot = 0;
+                    for (int i = 0; i < A.length; i++) dot += A[i] * B[i];
+                    return String.valueOf(dot); // 내적 결과
+                }
+                return Arrays.toString(result);
+            }
+
+            // 행렬 연산: double[][] + double[][]
+            if (parsedA instanceof double[][] && parsedB instanceof double[][]) {
+                double[][] A = (double[][]) parsedA;
+                double[][] B = (double[][]) parsedB;
+
+                int rows = A.length, cols = A[0].length;
+                if (operator.equals("+") || operator.equals("-")) {
+                    if (rows != B.length || cols != B[0].length) return "크기 불일치";
+                    double[][] result = new double[rows][cols];
+                    for (int i = 0; i < rows; i++)
+                        for (int j = 0; j < cols; j++)
+                            result[i][j] = operator.equals("+") ? A[i][j] + B[i][j] : A[i][j] - B[i][j];
+                    return Arrays.deepToString(result);
+                } else if (operator.equals("*")) {
+                    if (A[0].length != B.length) return "곱셈 불가능";
+                    double[][] result = new double[A.length][B[0].length];
+                    for (int i = 0; i < A.length; i++)
+                        for (int j = 0; j < B[0].length; j++)
+                            for (int k = 0; k < A[0].length; k++)
+                                result[i][j] += A[i][k] * B[k][j];
+                    return Arrays.deepToString(result);
+                }
+            }
+
+            return "지원하지 않는 연산 조합";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -224,20 +221,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private double[][] parseMatrix(String input) {
-        input = input.trim().replaceAll("\\s", ""); // 공백 제거
 
-        // 1차원 배열 감지: [1,2,3]
+    private Object parseMatrixDynamic(String input) {
+        input = input.trim().replaceAll("\\s", "");
+
         if (input.startsWith("[") && !input.startsWith("[[")) {
+            // 1차원 벡터
             String[] elements = input.replaceAll("[\\[\\]]", "").split(",");
-            double[][] matrix = new double[1][elements.length];
-            for (int j = 0; j < elements.length; j++) {
-                matrix[0][j] = Double.parseDouble(elements[j]);
+            double[] vector = new double[elements.length];
+            for (int i = 0; i < elements.length; i++) {
+                vector[i] = Double.parseDouble(elements[i]);
             }
-            return matrix;
+            return vector;
         }
 
-        // 2차원 배열 처리: [[1,2],[3,4]]
+        // 2차원 행렬
         input = input.replaceAll("^\\[\\[", "").replaceAll("]]$", "");
         String[] rows = input.split("],\\[");
         double[][] matrix = new double[rows.length][];
@@ -252,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
         return matrix;
     }
+
 
 
 
