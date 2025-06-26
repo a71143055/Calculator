@@ -214,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
     private String evaluateSet(String expr) {
         try {
             String operator = null;
-            if (expr.contains("∪")) operator = "∪";
-            else if (expr.contains("∩")) operator = "∩";
+            if (expr.contains("|")) operator = "|";
+            else if (expr.contains("&")) operator = "&";
             else if (expr.contains("-")) operator = "-";
 
             if (operator == null) return "지원하지 않는 연산";
