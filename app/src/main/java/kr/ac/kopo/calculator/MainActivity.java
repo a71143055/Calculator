@@ -1,6 +1,5 @@
 package kr.ac.kopo.calculator;
 
-import android.os.Handler;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
+import java.util.regex.Pattern;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -131,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
     private String evaluateMatrix(String expr) {
         try {
             String operator = null;
@@ -141,12 +142,12 @@ public class MainActivity extends AppCompatActivity {
 
             if (operator == null) return "지원하지 않는 연산";
 
-            String[] parts = expr.split(operator);
+            String[] parts = expr.split(Pattern.quote(operator));
             if (parts.length != 2) return "잘못된 형식";
 
             double[][] A = parseMatrix(parts[0].trim());
 
-            // 나눗셈은 스칼라 나눗셈만 허용
+            // 나눗셈은 스칼라만 허용
             if (operator.equals("/")) {
                 double scalar = Double.parseDouble(parts[1].trim());
                 if (scalar == 0) return "0으로 나눌 수 없음";
@@ -187,17 +188,16 @@ public class MainActivity extends AppCompatActivity {
             return "알 수 없는 연산";
 
         } catch (Exception e) {
+            e.printStackTrace(); // 디버깅용
             return "행렬 오류";
         }
     }
-
-
 
     private double[][] parseMatrix(String input) {
         input = input.trim();
 
         // 1차원 배열 감지: [1, 2, 3]
-        if (input.matches("^\\[\\s*([-+]?\\d+(\\.\\d+)?\\s*,\\s*)*[-+]?\\d+(\\.\\d+)?\\s*]$")) {
+        if (input.startsWith("[") && input.endsWith("]") && !input.contains("],[") && !input.contains("],[[")) {
             String[] elements = input.replaceAll("[\\[\\]]", "").split(",");
             double[][] matrix = new double[1][elements.length];
             for (int j = 0; j < elements.length; j++) {
@@ -210,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
         input = input.replaceAll("^\\[\\[", "").replaceAll("]]$", "").trim();
         String[] rows = input.split("],\\s*\\[");
         double[][] matrix = new double[rows.length][];
-
         for (int i = 0; i < rows.length; i++) {
             String[] elements = rows[i].replaceAll("[\\[\\]]", "").split(",");
             matrix[i] = new double[elements.length];
@@ -221,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
         return matrix;
     }
+
 
 
 
