@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
         input = input.trim();
 
         // 1차원 배열 감지: [1, 2, 3]
-        if (input.startsWith("[") && input.endsWith("]") && !input.contains("],[") && !input.contains("],[[")) {
+        if (input.startsWith("[") && input.endsWith("]") && !input.contains("],[") && !input.contains("],[")) {
             String[] elements = input.replaceAll("[\\[\\]]", "").split(",");
             double[][] matrix = new double[1][elements.length];
             for (int j = 0; j < elements.length; j++) {
