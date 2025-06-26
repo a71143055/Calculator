@@ -2,6 +2,7 @@ package kr.ac.kopo.calculator;
 
 import android.os.Handler;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView resultTextView;
     private Button buttonBackspace;
 
-    // 클래스 필드
     private final Handler handler = new Handler();
     private boolean isPressed = false;
 
@@ -46,33 +46,58 @@ public class MainActivity extends AppCompatActivity {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(this::onButtonClick);
             }
-            else if (id == R.id.buttonSquareBrackets || id == R.id.buttonParentheses || id == R.id.buttonBrace) {
+            else if (id == R.id.buttonParentheses || id == R.id.buttonBrace || id == R.id.buttonSquareBrackets) {
                 Button btn = findViewById(id);
-                btn.setOnClickListener(v -> {
-                    String label = ((Button) v).getText().toString().trim();
 
-                    // 괄호 쌍에서 왼쪽 괄호만 꺼내기
-                    switch (label) {
-                        case "( )":
-                            insertSymbol("("); // 또는 ")"로 바꿔도 돼요
+                final String[] symbols;
+                final String defaultText;
+
+                if (id == R.id.buttonParentheses) {
+                    symbols = new String[]{"(", ")"};
+                    defaultText = "( )";
+                } else if (id == R.id.buttonBrace) {
+                    symbols = new String[]{"{", "}"};
+                    defaultText = "{ }";
+                } else {
+                    symbols = new String[]{"[", "]"};
+                    defaultText = "[ ]";
+                }
+
+                final boolean[] toggle = {true};
+
+                // 접근성 경고 방지용 클릭 리스너
+                btn.setOnClickListener(v -> {});
+
+                btn.setOnTouchListener((v, event) -> {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            isPressed = true;
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (!isPressed) return;
+                                    btn.setText(toggle[0] ? symbols[0] : symbols[1]);
+                                    toggle[0] = !toggle[0];
+                                    handler.postDelayed(this, 150);
+                                }
+                            });
                             break;
-                        case "{ }":
-                            insertSymbol("{");
-                            break;
-                        case "[ ]":
-                            insertSymbol("[");
-                            break;
-                        case ")":
-                        case "}":
-                        case "]":
-                        case "(":
-                        case "{":
-                        case "[":
-                            insertSymbol(label);
+
+                        case MotionEvent.ACTION_UP:
+                            isPressed = false;
+                            handler.removeCallbacksAndMessages(null);
+                            String selected = toggle[0] ? symbols[1] : symbols[0];
+                            insertSymbol(selected);
+                            btn.setText(defaultText);
+                            toggle[0] = true;
+
+                            v.performClick(); // 접근성 호환
                             break;
                     }
+                    return true;
                 });
             }
+
         }
 
         buttonBackspace.setOnClickListener(new View.OnClickListener() {
