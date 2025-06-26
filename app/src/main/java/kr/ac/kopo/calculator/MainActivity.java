@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -132,110 +134,123 @@ public class MainActivity extends AppCompatActivity {
 
     private String evaluateMatrix(String expr) {
         try {
-            String operator = null;
-            if (expr.contains("+")) operator = "+";
-            else if (expr.contains("-")) operator = "-";
-            else if (expr.contains("*")) operator = "*";
-            else if (expr.contains("/")) operator = "/";
-
-            if (operator == null) return "지원하지 않는 연산";
-
-            String[] parts = expr.split(Pattern.quote(operator));
+            // 입력: "x^2 - 3x + 2 @ [[1,2],[0,1]]"
+            String[] parts = expr.split("@");
             if (parts.length != 2) return "잘못된 형식";
 
-            Object parsedA = parseMatrixDynamic(parts[0].trim());
-            Object parsedB = operator.equals("/") ? null : parseMatrixDynamic(parts[1].trim());
+            String poly = parts[0].trim();
+            String matrixStr = parts[1].trim();
 
-            // 스칼라 나눗셈
-            if (operator.equals("/")) {
-                double scalar = Double.parseDouble(parts[1].trim());
-                if (scalar == 0) return "0으로 나눌 수 없음";
+            double[][] A = parseMatrix(matrixStr);
+            double[] coeffs = parsePolynomial(poly); // 계수 추출
 
-                if (parsedA instanceof double[]) {
-                    double[] A = (double[]) parsedA;
-                    double[] result = new double[A.length];
-                    for (int i = 0; i < A.length; i++) {
-                        result[i] = A[i] / scalar;
-                    }
-                    return Arrays.toString(result);
-                } else if (parsedA instanceof double[][]) {
-                    double[][] A = (double[][]) parsedA;
-                    double[][] result = new double[A.length][A[0].length];
-                    for (int i = 0; i < A.length; i++)
-                        for (int j = 0; j < A[0].length; j++)
-                            result[i][j] = A[i][j] / scalar;
-                    return Arrays.deepToString(result);
-                } else {
-                    return "지원하지 않는 형식";
-                }
-            }
-
-            // 벡터 연산: double[] + double[]
-            if (parsedA instanceof double[] && parsedB instanceof double[]) {
-                double[] A = (double[]) parsedA;
-                double[] B = (double[]) parsedB;
-                if (A.length != B.length) return "크기 불일치";
-                double[] result = new double[A.length];
-                for (int i = 0; i < A.length; i++) {
-                    result[i] = operator.equals("+") ? A[i] + B[i] :
-                            operator.equals("-") ? A[i] - B[i] : A[i] * B[i]; // 내적 제외
-                }
-                if (operator.equals("*")) {
-                    double dot = 0;
-                    for (int i = 0; i < A.length; i++) dot += A[i] * B[i];
-                    return String.valueOf(dot); // 내적 결과
-                }
-                return Arrays.toString(result);
-            }
-
-            // 행렬 연산: double[][] + double[][]
-            if (parsedA instanceof double[][] && parsedB instanceof double[][]) {
-                double[][] A = (double[][]) parsedA;
-                double[][] B = (double[][]) parsedB;
-
-                int rows = A.length, cols = A[0].length;
-                if (operator.equals("+") || operator.equals("-")) {
-                    if (rows != B.length || cols != B[0].length) return "크기 불일치";
-                    double[][] result = new double[rows][cols];
-                    for (int i = 0; i < rows; i++)
-                        for (int j = 0; j < cols; j++)
-                            result[i][j] = operator.equals("+") ? A[i][j] + B[i][j] : A[i][j] - B[i][j];
-                    return Arrays.deepToString(result);
-                } else if (operator.equals("*")) {
-                    if (A[0].length != B.length) return "곱셈 불가능";
-                    double[][] result = new double[A.length][B[0].length];
-                    for (int i = 0; i < A.length; i++)
-                        for (int j = 0; j < B[0].length; j++)
-                            for (int k = 0; k < A[0].length; k++)
-                                result[i][j] += A[i][k] * B[k][j];
-                    return Arrays.deepToString(result);
-                }
-            }
-
-            return "지원하지 않는 연산 조합";
+            double[][] result = applyPolynomial(A, coeffs);
+            return Arrays.deepToString(result);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "행렬 오류";
+            return "다항 행렬 오류";
         }
     }
 
+    private double[] parsePolynomial(String poly) {
+        poly = poly.replaceAll("-", "+-").replaceAll("\\s", "");
+        String[] terms = poly.split("\\+");
+        List<Double> coeffList = new ArrayList<>();
+
+        for (String term : terms) {
+            if (term.isEmpty()) continue;
+            if (term.contains("x^")) {
+                int degree = Integer.parseInt(term.split("\\^")[1]);
+                double coeff = parseCoeff(term.split("x")[0]);
+                while (coeffList.size() <= degree) coeffList.add(0.0);
+                coeffList.set(degree, coeff);
+            } else if (term.contains("x")) {
+                double coeff = parseCoeff(term.split("x")[0]);
+                while (coeffList.size() <= 1) coeffList.add(0.0);
+                coeffList.set(1, coeff);
+            } else {
+                double constant = Double.parseDouble(term);
+                while (coeffList.size() <= 0) coeffList.add(0.0);
+                coeffList.set(0, constant);
+            }
+        }
+
+        return coeffList.stream().mapToDouble(Double::doubleValue).toArray();
+    }
+
+    private double[][] applyPolynomial(double[][] A, double[] coeffs) {
+        int n = A.length;
+        double[][] result = zeroMatrix(n);
+        double[][] power = identityMatrix(n);
+
+        for (double coeff : coeffs) {
+            double[][] term = scalarMultiply(power, coeff);
+            result = addMatrices(result, term);
+            power = multiplyMatrices(power, A);
+        }
+
+        return result;
+    }
+
+    private double[][] zeroMatrix(int n) {
+        return new double[n][n];
+    }
+
+    private double[][] identityMatrix(int n) {
+        double[][] I = new double[n][n];
+        for (int i = 0; i < n; i++) I[i][i] = 1;
+        return I;
+    }
+
+    private double[][] scalarMultiply(double[][] A, double scalar) {
+        int n = A.length;
+        double[][] result = new double[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                result[i][j] = A[i][j] * scalar;
+        return result;
+    }
+
+    private double[][] addMatrices(double[][] A, double[][] B) {
+        int n = A.length;
+        double[][] result = new double[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                result[i][j] = A[i][j] + B[i][j];
+        return result;
+    }
+
+    private double[][] multiplyMatrices(double[][] A, double[][] B) {
+        int n = A.length;
+        double[][] result = new double[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                for (int k = 0; k < n; k++)
+                    result[i][j] += A[i][k] * B[k][j];
+        return result;
+    }
 
 
-    private Object parseMatrixDynamic(String input) {
+    private double parseCoeff(String s) {
+        if (s.equals("") || s.equals("+")) return 1;
+        if (s.equals("-")) return -1;
+        return Double.parseDouble(s);
+    }
+
+
+    private double[][] parseMatrix(String input) {
         input = input.trim().replaceAll("\\s", "");
 
         if (input.startsWith("[") && !input.startsWith("[[")) {
-            // 1차원 벡터
             String[] elements = input.replaceAll("[\\[\\]]", "").split(",");
-            double[] vector = new double[elements.length];
+            double[][] matrix = new double[1][elements.length];
             for (int i = 0; i < elements.length; i++) {
-                vector[i] = Double.parseDouble(elements[i]);
+                matrix[0][i] = Double.parseDouble(elements[i]);
             }
-            return vector;
+            return matrix;
         }
 
-        // 2차원 행렬
         input = input.replaceAll("^\\[\\[", "").replaceAll("]]$", "");
         String[] rows = input.split("],\\[");
         double[][] matrix = new double[rows.length][];
@@ -250,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
         return matrix;
     }
+
 
 
 
