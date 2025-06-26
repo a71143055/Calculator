@@ -36,18 +36,34 @@ public class MainActivity extends AppCompatActivity {
 
         for (int id : buttonIds) {
             if (id != R.id.buttonBackspace && id != R.id.buttonRecord &&
-            id != R.id.buttonPi) {
+            id != R.id.buttonPi && id != R.id.buttonSquareBrackets && id != R.id.buttonParentheses && id != R.id.buttonBrace) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(this::onButtonClick);
             }
             else if (id == R.id.buttonSquareBrackets || id == R.id.buttonParentheses || id == R.id.buttonBrace) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(v -> {
-                    String label = ((Button) v).getText().toString();
-                    if (label.equals("(") || label.equals(")") ||
-                            label.equals("[") || label.equals("]") ||
-                            label.equals("{") || label.equals("}")) {
-                        insertSymbol(label);
+                    String label = ((Button) v).getText().toString().trim();
+
+                    // 괄호 쌍에서 왼쪽 괄호만 꺼내기
+                    switch (label) {
+                        case "( )":
+                            insertSymbol("("); // 또는 ")"로 바꿔도 돼요
+                            break;
+                        case "{ }":
+                            insertSymbol("{");
+                            break;
+                        case "[ ]":
+                            insertSymbol("[");
+                            break;
+                        case ")":
+                        case "}":
+                        case "]":
+                        case "(":
+                        case "{":
+                        case "[":
+                            insertSymbol(label);
+                            break;
                     }
                 });
             }
