@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class MainActivity extends AppCompatActivity {
     private final StringBuilder inputExpression = new StringBuilder();
@@ -94,47 +96,13 @@ public class MainActivity extends AppCompatActivity {
 
     private String calculateExpression(String expression) {
         try {
-            String[] parts;
-            double a, b;
+            // Python 스타일 연산자들 변환
+            expression = expression.replace("**", "^");   // 제곱
+            expression = expression.replace("//", "/");   // 정수 나눗셈은 일반 나눗셈으로 처리
 
-            if (expression.contains("**")) {
-                parts = expression.split("\\*\\*");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "**"));
-            } else if (expression.contains("//")) {
-                parts = expression.split("//");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "//"));
-            } else if (expression.contains("%")) {
-                parts = expression.split("%");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "%"));
-            } else if (expression.contains("+")) {
-                parts = expression.split("\\+");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "+"));
-            } else if (expression.contains("-")) {
-                parts = expression.split("-");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "-"));
-            } else if (expression.contains("*")) {
-                parts = expression.split("\\*");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "*"));
-            } else if (expression.contains("/")) {
-                parts = expression.split("/");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "/"));
-            } else {
-                return "계산 불가";
-            }
+            Expression exp = new ExpressionBuilder(expression).build();
+            double result = exp.evaluate();
+            return String.valueOf(result);
         } catch (Exception e) {
             return "오류";
         }
