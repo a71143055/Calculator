@@ -196,35 +196,36 @@ public class MainActivity extends AppCompatActivity {
     private double[][] parseMatrix(String input) {
         input = input.trim();
 
-        if (input.matches("^\\[\\s*([\\d.\\-]+\\s*,\\s*)*[\\d.\\-]+\\s*]$")) {
-            // 1차원 배열 감지: [1, 2, 3] → [ [1, 2, 3] ]
-            String cleaned = input.replaceAll("[\\[\\]]", "");
-            String[] elements = cleaned.split(",");
+        // 1차원 배열 감지: [1, 2, 3]
+        if (input.matches("^\\[\\s*([-+]?\\d+(\\.\\d+)?\\s*,\\s*)*[-+]?\\d+(\\.\\d+)?\\s*]$")) {
+            String[] elements = input.replaceAll("[\\[\\]]", "").split(",");
             double[][] matrix = new double[1][elements.length];
             for (int j = 0; j < elements.length; j++) {
                 matrix[0][j] = Double.parseDouble(elements[j].trim());
+            }
+            return matrix;
         }
+
+        // 2차원 배열 처리: [[1,2],[3,4]]
+        input = input.replaceAll("^\\[\\[", "").replaceAll("]]$", "").trim();
+        String[] rows = input.split("],\\s*\\[");
+        double[][] matrix = new double[rows.length][];
+
+        for (int i = 0; i < rows.length; i++) {
+            String[] elements = rows[i].replaceAll("[\\[\\]]", "").split(",");
+            matrix[i] = new double[elements.length];
+            for (int j = 0; j < elements.length; j++) {
+                matrix[i][j] = Double.parseDouble(elements[j].trim());
+            }
+        }
+
         return matrix;
     }
 
-    // 2차원 배열 처리: [[1,2],[3,4]]
-    input = input.replaceAll("^\\[\\[", "").replaceAll("]]$", "").trim();
-    String[] rows = input.split("],\\s*\\[");
-    double[][] matrix = new double[rows.length][];
-    for (int i = 0; i < rows.length; i++) {
-        String cleaned = rows[i].replaceAll("[\\[\\]]", "");
-        String[] elements = cleaned.split(",");
-        matrix[i] = new double[elements.length];
-        for (int j = 0; j < elements.length; j++) {
-            matrix[i][j] = Double.parseDouble(elements[j].trim());
-        }
-    }
-    return matrix;
-}
 
 
 
-private String evaluateSet(String expr) {
+    private String evaluateSet(String expr) {
         try {
             String operator = null;
             int opIndex = -1;
