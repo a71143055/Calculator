@@ -9,6 +9,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class MainActivity extends AppCompatActivity {
     private final StringBuilder inputExpression = new StringBuilder();
     private TextView calcTextView;
@@ -108,6 +112,16 @@ public class MainActivity extends AppCompatActivity {
             expression = expression.replace("**", "^");   // 제곱
             expression = expression.replace("//", "/");   // 정수 나눗셈은 일반 나눗셈으로 처리
 
+            // 행렬 연산 감지
+            if (expression.startsWith("[[") && expression.endsWith("]]")) {
+                return evaluateMatrix(expression);
+            }
+
+            // 집합 연산 감지
+            if (expression.startsWith("{") && expression.endsWith("}")) {
+                return evaluateSet(expression);
+            }
+
             Expression exp = new ExpressionBuilder(expression).build();
             double result = exp.evaluate();
             return String.valueOf(result);
@@ -115,6 +129,124 @@ public class MainActivity extends AppCompatActivity {
             return "오류";
         }
     }
+
+    private String evaluateMatrix(String expr) {
+        try {
+            String operator = null;
+            if (expr.contains("+")) operator = "+";
+            else if (expr.contains("-")) operator = "-";
+            else if (expr.contains("*")) operator = "*";
+            else if (expr.contains("/")) operator = "/";
+
+            if (operator == null) return "지원하지 않는 연산";
+
+            String[] parts = expr.split(operator);
+            if (parts.length != 2) return "잘못된 형식";
+
+            double[][] A = parseMatrix(parts[0].trim());
+
+            // 나눗셈은 스칼라 나눗셈만 허용
+            if (operator.equals("/")) {
+                double scalar = Double.parseDouble(parts[1].trim());
+                if (scalar == 0) return "0으로 나눌 수 없음";
+
+                double[][] result = new double[A.length][A[0].length];
+                for (int i = 0; i < A.length; i++)
+                    for (int j = 0; j < A[0].length; j++)
+                        result[i][j] = A[i][j] / scalar;
+
+                return Arrays.deepToString(result);
+            }
+
+            double[][] B = parseMatrix(parts[1].trim());
+
+            int rows = A.length;
+            int cols = A[0].length;
+
+            switch (operator) {
+                case "+":
+                case "-":
+                    if (rows != B.length || cols != B[0].length) return "크기 불일치";
+                    double[][] resultAddSub = new double[rows][cols];
+                    for (int i = 0; i < rows; i++)
+                        for (int j = 0; j < cols; j++)
+                            resultAddSub[i][j] = operator.equals("+") ? A[i][j] + B[i][j] : A[i][j] - B[i][j];
+                    return Arrays.deepToString(resultAddSub);
+
+                case "*":
+                    if (A[0].length != B.length) return "곱셈 불가능";
+                    double[][] resultMul = new double[rows][B[0].length];
+                    for (int i = 0; i < rows; i++)
+                        for (int j = 0; j < B[0].length; j++)
+                            for (int k = 0; k < A[0].length; k++)
+                                resultMul[i][j] += A[i][k] * B[k][j];
+                    return Arrays.deepToString(resultMul);
+            }
+
+            return "알 수 없는 연산";
+
+        } catch (Exception e) {
+            return "행렬 오류";
+        }
+    }
+
+
+
+    private double[][] parseMatrix(String input) {
+        // 양 끝 중첩 대괄호 제거 및 트림
+        input = input.replaceAll("^\\[\\[", "").replaceAll("]]$", "").trim();
+        // 행 단위로 분리
+        String[] rows = input.split("],\\s*\\[");
+        double[][] matrix = new double[rows.length][];
+        for (int i = 0; i < rows.length; i++) {
+            // 각 행에서 대괄호 제거 후 숫자 분리
+            String cleaned = rows[i].replaceAll("[\\[\\]]", "");
+            String[] elements = cleaned.split(",");
+            matrix[i] = new double[elements.length];
+            for (int j = 0; j < elements.length; j++) {
+                matrix[i][j] = Double.parseDouble(elements[j].trim());
+            }
+        }
+        return matrix;
+    }
+
+
+    private String evaluateSet(String expr) {
+        try {
+            String operator = null;
+            if (expr.contains("∪")) operator = "∪";
+            else if (expr.contains("∩")) operator = "∩";
+            else if (expr.contains("-")) operator = "-";
+
+            if (operator == null) return "지원하지 않는 연산";
+
+            String[] parts = expr.split(operator);
+            if (parts.length != 2) return "잘못된 형식";
+
+            Set<String> A = new HashSet<>(Arrays.asList(parts[0].replaceAll("[{}\\s]", "").split(",")));
+            Set<String> B = new HashSet<>(Arrays.asList(parts[1].replaceAll("[{}\\s]", "").split(",")));
+
+            Set<String> result = new HashSet<>(A);
+
+            switch (operator) {
+                case "|":
+                    result.addAll(B); // 합집합
+                    break;
+                case "&":
+                    result.retainAll(B); // 교집합
+                    break;
+                case "-":
+                    result.removeAll(B); // 차집합
+                    break;
+            }
+
+            return result.toString();
+        } catch (Exception e) {
+            return "집합 오류";
+        }
+    }
+
+
 
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
