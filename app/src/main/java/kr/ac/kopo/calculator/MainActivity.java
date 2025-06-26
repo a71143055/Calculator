@@ -197,22 +197,29 @@ public class MainActivity extends AppCompatActivity {
         input = input.trim();
 
         // 1차원 배열 감지: [1, 2, 3]
-        if (input.startsWith("[") && input.endsWith("]") && !input.contains("],[") && !input.contains("],[")) {
-            String[] elements = input.replace("[", "").replace("]", "").split(",");
+        if (input.startsWith("[") && input.endsWith("]") &&
+                !input.contains("],[") && !input.contains("], [")) {
+
+            String[] elements = input.replaceAll("[\\[\\]]", "").split(",");
             double[][] matrix = new double[1][elements.length];
+
             for (int j = 0; j < elements.length; j++) {
                 matrix[0][j] = Double.parseDouble(elements[j].trim());
             }
+
             return matrix;
         }
 
         // 2차원 배열 처리: [[1,2],[3,4]]
         input = input.replaceAll("^\\[\\[", "").replaceAll("]]$", "").trim();
         String[] rows = input.split("],\\s*\\[");
+
         double[][] matrix = new double[rows.length][];
+
         for (int i = 0; i < rows.length; i++) {
             String[] elements = rows[i].replaceAll("[\\[\\]]", "").split(",");
             matrix[i] = new double[elements.length];
+
             for (int j = 0; j < elements.length; j++) {
                 matrix[i][j] = Double.parseDouble(elements[j].trim());
             }
@@ -220,10 +227,6 @@ public class MainActivity extends AppCompatActivity {
 
         return matrix;
     }
-
-
-
-
 
     private String evaluateSet(String expr) {
         try {
@@ -256,9 +259,6 @@ public class MainActivity extends AppCompatActivity {
             return "집합 오류";
         }
     }
-
-
-
 
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
