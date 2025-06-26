@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (int id : buttonIds) {
             if (id != R.id.buttonBackspace && id != R.id.buttonRecord &&
-            id != R.id.buttonPi && id == R.id.buttonSquareBrackets || id == R.id.buttonParentheses || id == R.id.buttonBrace) {
+            id != R.id.buttonPi && id != R.id.buttonSquareBrackets && id != R.id.buttonParentheses && id != R.id.buttonBrace) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(this::onButtonClick);
             }
