@@ -43,12 +43,24 @@ public class MainActivity extends AppCompatActivity {
             }else if (id == R.id.buttonSquareBrackets) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(v -> insertSymbol("[")); // 또는 "]"
+                btn.setOnLongClickListener(v -> {
+                    insertSymbol("]"); // 길게 누르면 오른쪽 괄호
+                    return true; // 이벤트 소비
+                });
             } else if (id == R.id.buttonParentheses) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(v -> insertSymbol("(")); // 또는 ")"
+                btn.setOnLongClickListener(v -> {
+                    insertSymbol(")"); // 길게 누르면 오른쪽 괄호
+                    return true; // 이벤트 소비
+                });
             } else if (id == R.id.buttonBrace) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(v -> insertSymbol("{")); // 또는 "}"
+                btn.setOnLongClickListener(v -> {
+                    insertSymbol("}"); // 길게 누르면 오른쪽 괄호
+                    return true; // 이벤트 소비
+                });
             }
         }
 
