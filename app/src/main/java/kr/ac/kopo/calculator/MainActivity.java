@@ -136,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             // 입력: "x^2 - 3x + 2 @ [[1,2],[0,1]]"
             String[] parts = expr.split("@");
-            if (parts.length != 2) return "잘못된 형식";
 
             String poly = parts[0].trim();
             String matrixStr = parts[1].trim();
