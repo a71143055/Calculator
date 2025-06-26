@@ -6,8 +6,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.regex.Pattern;
-
 public class MainActivity extends AppCompatActivity {
     private final StringBuilder inputExpression = new StringBuilder();
     private TextView calcTextView;
@@ -116,30 +114,30 @@ public class MainActivity extends AppCompatActivity {
                 a = Double.parseDouble(parts[0]);
                 b = Double.parseDouble(parts[1]);
                 return String.valueOf(calculate(a, b, "-"));
+            } else if (expression.contains("**")) {
+                parts = expression.split("\\*\\*");
+                a = Double.parseDouble(parts[0]);
+                b = Double.parseDouble(parts[1]);
+                return String.valueOf(calculate(a, b, "**"));
             } else if (expression.contains("*")) {
                 parts = expression.split("\\*");
                 a = Double.parseDouble(parts[0]);
                 b = Double.parseDouble(parts[1]);
                 return String.valueOf(calculate(a, b, "*"));
-            } else if (expression.contains("**")) {
-                parts = expression.split(Pattern.quote("**"));
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "**"));
-            } else if (expression.contains("/")) {
-                parts = expression.split("/");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
-                return String.valueOf(calculate(a, b, "/"));
             } else if (expression.contains("//")) {
-                parts = expression.split(Pattern.quote("//"));
+                parts = expression.split("//");
                 a = Double.parseDouble(parts[0]);
                 b = Double.parseDouble(parts[1]);
                 return String.valueOf(calculate(a, b, "//"));
+            } else if (expression.contains("/")) {
+                parts = expression.split("/");
+                a = Integer.parseInt(parts[0]);
+                b = Integer.parseInt(parts[1]);
+                return String.valueOf(calculate(a, b, "/"));
             } else if (expression.contains("%")) {
                 parts = expression.split("%");
-                a = Double.parseDouble(parts[0]);
-                b = Double.parseDouble(parts[1]);
+                a = Integer.parseInt(parts[0]);
+                b = Integer.parseInt(parts[1]);
                 return String.valueOf(calculate(a, b, "%"));
             } else {
                 return "계산 불가";
