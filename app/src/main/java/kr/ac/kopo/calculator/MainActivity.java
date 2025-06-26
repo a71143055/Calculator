@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 btn.setOnClickListener(this::onButtonClick);
             }
             else if (id == R.id.buttonParentheses || id == R.id.buttonBrace || id == R.id.buttonSquareBrackets) {
-                Button btn = findViewById(id);
+                final Button btn = findViewById(id); // 반드시 final!
 
                 final String[] symbols;
                 final String defaultText;
@@ -65,8 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
                 final boolean[] toggle = {true};
 
-                // 접근성 경고 방지용 클릭 리스너
-                btn.setOnClickListener(v -> {});
+                btn.setOnClickListener(v -> {}); // 접근성 경고 방지용
 
                 btn.setOnTouchListener((v, event) -> {
                     switch (event.getAction()) {
@@ -91,13 +90,13 @@ public class MainActivity extends AppCompatActivity {
                             btn.setText(defaultText);
                             toggle[0] = true;
 
-                            v.performClick(); // 접근성 호환
+                            v.performClick(); // 접근성 이벤트 전달
                             break;
                     }
                     return true;
                 });
-            }
 
+            }
         }
 
         buttonBackspace.setOnClickListener(new View.OnClickListener() {
