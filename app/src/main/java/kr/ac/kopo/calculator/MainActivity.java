@@ -1,9 +1,7 @@
 package kr.ac.kopo.calculator;
 
-import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,10 +14,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView calcTextView;
     private TextView resultTextView;
     private Button buttonBackspace;
-
-    private final Handler handler = new Handler();
-    private boolean isPressed = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,55 +41,23 @@ public class MainActivity extends AppCompatActivity {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(this::onButtonClick);
             }
-            else if (id == R.id.buttonParentheses || id == R.id.buttonBrace || id == R.id.buttonSquareBrackets) {
-                final Button btn = findViewById(id); // 반드시 final 선언
+            else if (id == R.id.buttonSquareBrackets || id == R.id.buttonParentheses || id == R.id.buttonBrace) {
+                Button btn = findViewById(id);
+                btn.setOnClickListener(v -> {
+                    String label = ((Button) v).getText().toString().trim();
 
-                final String[] symbols;
-                final String defaultText;
-
-                if (id == R.id.buttonParentheses) {
-                    symbols = new String[]{"(", ")"};
-                    defaultText = "( )";
-                } else if (id == R.id.buttonBrace) {
-                    symbols = new String[]{"{", "}"};
-                    defaultText = "{ }";
-                } else {
-                    symbols = new String[]{"[", "]"};
-                    defaultText = "[ ]";
-                }
-
-                final boolean[] toggle = {true};
-
-                btn.setOnClickListener(v -> {});
-
-                @SuppressLint("ClickableViewAccessibility")
-                btn.setOnTouchListener((v, event) -> {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            isPressed = true;
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (!isPressed) return;
-                                    btn.setText(toggle[0] ? symbols[0] : symbols[1]);
-                                    toggle[0] = !toggle[0];
-                                    handler.postDelayed(this, 150);
-                                }
-                            });
+                    // 괄호 쌍에서 왼쪽 괄호만 꺼내기
+                    switch (label) {
+                        case "( )":
+                            insertSymbol("("); // 또는 ")"로 바꿔도 돼요
                             break;
-
-                        case MotionEvent.ACTION_UP:
-                            isPressed = false;
-                            handler.removeCallbacksAndMessages(null);
-                            String selected = toggle[0] ? symbols[1] : symbols[0];
-                            insertSymbol(selected);
-                            btn.setText(defaultText);
-                            toggle[0] = true;
-
-                            v.performClick(); // 시스템에 클릭 이벤트 전달
+                        case "{ }":
+                            insertSymbol("{");
+                            break;
+                        case "[ ]":
+                            insertSymbol("[");
                             break;
                     }
-                    return true;
                 });
             }
         }
