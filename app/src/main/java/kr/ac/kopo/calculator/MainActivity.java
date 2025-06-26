@@ -225,34 +225,40 @@ public class MainActivity extends AppCompatActivity {
         return matrix; // double[][]
     }
 
-
-
-
-
-
     private String evaluateSet(String expr) {
         try {
-            String operator = null;
-            int opIndex = -1;
+            expr = expr.replaceAll("\\s", ""); // 공백 제거
 
-            if ((opIndex = expr.indexOf("|")) != -1) operator = "|";
-            else if ((opIndex = expr.indexOf("&")) != -1) operator = "&";
-            else if ((opIndex = expr.indexOf("-")) != -1) operator = "-";
+            // 집합 추출 + 연산자 추출
+            List<Set<String>> sets = new ArrayList<>();
+            List<String> operators = new ArrayList<>();
 
-            if (operator == null) return "지원하지 않는 연산";
+            Matcher m = Pattern.compile("(\\{[^{}]*})|([|&-])").matcher(expr);
+            while (m.find()) {
+                String token = m.group();
+                if (token.equals("|") || token.equals("&") || token.equals("-")) {
+                    operators.add(token);
+                } else {
+                    String[] elements = token.replaceAll("[{}]", "").split(",");
+                    Set<String> set = new LinkedHashSet<>();
+                    for (String e : elements) {
+                        if (!e.isEmpty()) set.add(e);
+                    }
+                    sets.add(set);
+                }
+            }
 
-            String left = expr.substring(0, opIndex).trim();
-            String right = expr.substring(opIndex + 1).trim();
+            if (sets.size() < 2 || sets.size() != operators.size() + 1) return "잘못된 형식";
 
-            Set<String> A = new LinkedHashSet<>(Arrays.asList(left.replaceAll("[{}\\s]", "").split(",")));
-            Set<String> B = new LinkedHashSet<>(Arrays.asList(right.replaceAll("[{}\\s]", "").split(",")));
+            Set<String> result = new LinkedHashSet<>(sets.get(0));
 
-            Set<String> result = new LinkedHashSet<>(A); // 순서 유지
-
-            switch (operator) {
-                case "|": result.addAll(B); break;           // 합집합
-                case "&": result.retainAll(B); break;        // 교집합
-                case "-": result.removeAll(B); break;        // 차집합
+            for (int i = 0; i < operators.size(); i++) {
+                Set<String> next = sets.get(i + 1);
+                switch (operators.get(i)) {
+                    case "|": result.addAll(next); break;
+                    case "&": result.retainAll(next); break;
+                    case "-": result.removeAll(next); break;
+                }
             }
 
             return "{" + String.join(", ", result) + "}";
@@ -261,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
             return "집합 오류";
         }
     }
+
 
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
