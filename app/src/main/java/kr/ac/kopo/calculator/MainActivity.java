@@ -107,19 +107,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private double calculate(double a, double b, String op) {
-        switch (op) {
-            case "+": return a + b;
-            case "-": return a - b;
-            case "*": return a * b;
-            case "**": return Math.pow(a, b);
-            case "/": return b != 0 ? a / b : Double.NaN;
-            case "//": return b != 0 ? Math.floor(a / b) : Double.NaN;
-            case "%": return b != 0 ? a % b : Double.NaN;
-            default: return 0;
-        }
-    }
-
     private String calculateExpression(String expression) {
         try {
             // Python 스타일 연산자들 변환
