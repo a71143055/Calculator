@@ -130,8 +130,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
     private String evaluateMatrix(String expr) {
         try {
             String operator = null;
@@ -147,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
             double[][] A = parseMatrix(parts[0].trim());
 
-            // 나눗셈은 스칼라만 허용
+            // 스칼라 나눗셈
             if (operator.equals("/")) {
                 double scalar = Double.parseDouble(parts[1].trim());
                 if (scalar == 0) return "0으로 나눌 수 없음";
@@ -162,36 +160,55 @@ public class MainActivity extends AppCompatActivity {
 
             double[][] B = parseMatrix(parts[1].trim());
 
-            int rows = A.length;
-            int cols = A[0].length;
+            // 1차원 벡터 연산 감지
+            boolean isVector = A.length == 1 && B.length == 1 && A[0].length == B[0].length;
 
             switch (operator) {
                 case "+":
                 case "-":
-                    if (rows != B.length || cols != B[0].length) return "크기 불일치";
-                    double[][] resultAddSub = new double[rows][cols];
-                    for (int i = 0; i < rows; i++)
-                        for (int j = 0; j < cols; j++)
-                            resultAddSub[i][j] = operator.equals("+") ? A[i][j] + B[i][j] : A[i][j] - B[i][j];
-                    return Arrays.deepToString(resultAddSub);
+                    if (isVector) {
+                        double[] result = new double[A[0].length];
+                        for (int i = 0; i < result.length; i++) {
+                            result[i] = operator.equals("+") ? A[0][i] + B[0][i] : A[0][i] - B[0][i];
+                        }
+                        return Arrays.toString(result);
+                    } else if (A.length == B.length && A[0].length == B[0].length) {
+                        double[][] result = new double[A.length][A[0].length];
+                        for (int i = 0; i < A.length; i++)
+                            for (int j = 0; j < A[0].length; j++)
+                                result[i][j] = operator.equals("+") ? A[i][j] + B[i][j] : A[i][j] - B[i][j];
+                        return Arrays.deepToString(result);
+                    } else {
+                        return "크기 불일치";
+                    }
 
                 case "*":
-                    if (A[0].length != B.length) return "곱셈 불가능";
-                    double[][] resultMul = new double[rows][B[0].length];
-                    for (int i = 0; i < rows; i++)
-                        for (int j = 0; j < B[0].length; j++)
-                            for (int k = 0; k < A[0].length; k++)
-                                resultMul[i][j] += A[i][k] * B[k][j];
-                    return Arrays.deepToString(resultMul);
+                    if (isVector) {
+                        double sum = 0;
+                        for (int i = 0; i < A[0].length; i++) {
+                            sum += A[0][i] * B[0][i];
+                        }
+                        return String.valueOf(sum); // 내적 결과
+                    } else if (A[0].length == B.length) {
+                        double[][] result = new double[A.length][B[0].length];
+                        for (int i = 0; i < A.length; i++)
+                            for (int j = 0; j < B[0].length; j++)
+                                for (int k = 0; k < A[0].length; k++)
+                                    result[i][j] += A[i][k] * B[k][j];
+                        return Arrays.deepToString(result);
+                    } else {
+                        return "곱셈 불가능";
+                    }
             }
 
             return "알 수 없는 연산";
 
         } catch (Exception e) {
-            e.printStackTrace(); // 디버깅용
+            e.printStackTrace();
             return "행렬 오류";
         }
     }
+
 
     private double[][] parseMatrix(String input) {
         input = input.trim();
@@ -217,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
             return matrix;
         }
     }
+
 
 
     private String evaluateSet(String expr) {
