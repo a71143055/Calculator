@@ -1,5 +1,6 @@
 package kr.ac.kopo.calculator;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 btn.setOnClickListener(this::onButtonClick);
             }
             else if (id == R.id.buttonParentheses || id == R.id.buttonBrace || id == R.id.buttonSquareBrackets) {
-                final Button btn = findViewById(id); // 반드시 final!
+                final Button btn = findViewById(id); // 반드시 final 선언
 
                 final String[] symbols;
                 final String defaultText;
@@ -65,8 +66,9 @@ public class MainActivity extends AppCompatActivity {
 
                 final boolean[] toggle = {true};
 
-                btn.setOnClickListener(v -> {}); // 접근성 경고 방지용
+                btn.setOnClickListener(v -> {});
 
+                @SuppressLint("ClickableViewAccessibility")
                 btn.setOnTouchListener((v, event) -> {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
@@ -90,12 +92,11 @@ public class MainActivity extends AppCompatActivity {
                             btn.setText(defaultText);
                             toggle[0] = true;
 
-                            v.performClick(); // 접근성 이벤트 전달
+                            v.performClick(); // 시스템에 클릭 이벤트 전달
                             break;
                     }
                     return true;
                 });
-
             }
         }
 
