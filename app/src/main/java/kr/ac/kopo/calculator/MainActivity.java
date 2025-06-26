@@ -11,6 +11,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -214,37 +215,35 @@ public class MainActivity extends AppCompatActivity {
     private String evaluateSet(String expr) {
         try {
             String operator = null;
-            if (expr.contains("|")) operator = "|";
-            else if (expr.contains("&")) operator = "&";
-            else if (expr.contains("-")) operator = "-";
+            int opIndex = -1;
+
+            if ((opIndex = expr.indexOf("|")) != -1) operator = "|";
+            else if ((opIndex = expr.indexOf("&")) != -1) operator = "&";
+            else if ((opIndex = expr.indexOf("-")) != -1) operator = "-";
 
             if (operator == null) return "지원하지 않는 연산";
 
-            String[] parts = expr.split(operator);
-            if (parts.length != 2) return "잘못된 형식";
+            String left = expr.substring(0, opIndex).trim();
+            String right = expr.substring(opIndex + 1).trim();
 
-            Set<String> A = new HashSet<>(Arrays.asList(parts[0].replaceAll("[{}\\s]", "").split(",")));
-            Set<String> B = new HashSet<>(Arrays.asList(parts[1].replaceAll("[{}\\s]", "").split(",")));
+            Set<String> A = new LinkedHashSet<>(Arrays.asList(left.replaceAll("[{}\\s]", "").split(",")));
+            Set<String> B = new LinkedHashSet<>(Arrays.asList(right.replaceAll("[{}\\s]", "").split(",")));
 
-            Set<String> result = new HashSet<>(A);
+            Set<String> result = new LinkedHashSet<>(A); // 순서 유지
 
             switch (operator) {
-                case "|":
-                    result.addAll(B); // 합집합
-                    break;
-                case "&":
-                    result.retainAll(B); // 교집합
-                    break;
-                case "-":
-                    result.removeAll(B); // 차집합
-                    break;
+                case "|": result.addAll(B); break;           // 합집합
+                case "&": result.retainAll(B); break;        // 교집합
+                case "-": result.removeAll(B); break;        // 차집합
             }
 
             return "{" + String.join(", ", result) + "}";
+
         } catch (Exception e) {
             return "집합 오류";
         }
     }
+
 
 
 
