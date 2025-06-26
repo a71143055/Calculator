@@ -211,29 +211,34 @@ public class MainActivity extends AppCompatActivity {
 
 
     private double[][] parseMatrix(String input) {
-        input = input.trim();
+        input = input.trim().replaceAll("\\s", ""); // 공백 제거
 
-        if (!input.startsWith("[[") && input.startsWith("[")) {
+        // 1차원 배열 감지: [1,2,3]
+        if (input.startsWith("[") && !input.startsWith("[[")) {
             String[] elements = input.replaceAll("[\\[\\]]", "").split(",");
             double[][] matrix = new double[1][elements.length];
             for (int j = 0; j < elements.length; j++) {
-                matrix[0][j] = Double.parseDouble(elements[j].trim());
-            }
-            return matrix;
-        } else {
-            input = input.replaceAll("^\\[\\[", "").replaceAll("]]$", "");
-            String[] rows = input.split("],\\s*\\[");
-            double[][] matrix = new double[rows.length][];
-            for (int i = 0; i < rows.length; i++) {
-                String[] elements = rows[i].split(",");
-                matrix[i] = new double[elements.length];
-                for (int j = 0; j < elements.length; j++) {
-                    matrix[i][j] = Double.parseDouble(elements[j].trim());
-                }
+                matrix[0][j] = Double.parseDouble(elements[j]);
             }
             return matrix;
         }
+
+        // 2차원 배열 처리: [[1,2],[3,4]]
+        input = input.replaceAll("^\\[\\[", "").replaceAll("]]$", "");
+        String[] rows = input.split("],\\[");
+        double[][] matrix = new double[rows.length][];
+
+        for (int i = 0; i < rows.length; i++) {
+            String[] elements = rows[i].split(",");
+            matrix[i] = new double[elements.length];
+            for (int j = 0; j < elements.length; j++) {
+                matrix[i][j] = Double.parseDouble(elements[j]);
+            }
+        }
+
+        return matrix;
     }
+
 
 
 
