@@ -14,6 +14,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView resultTextView;
     private Button buttonBackspace;
 
+    // 클래스 필드
+    private final Handler handler = new Handler();
+    private boolean isPressed = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
