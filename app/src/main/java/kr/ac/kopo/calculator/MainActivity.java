@@ -2,6 +2,7 @@ package kr.ac.kopo.calculator;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,12 +18,6 @@ public class MainActivity extends AppCompatActivity {
 
     private final Handler handler = new Handler();
     private boolean isPressed = false;
-
-    private boolean toggleParen = true;
-    private boolean toggleBrace = true;
-    private boolean toggleBracket = true;
-
-    private boolean insertLeftParen = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,31 +47,57 @@ public class MainActivity extends AppCompatActivity {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(this::onButtonClick);
 
-            } else if (id == R.id.buttonSquareBrackets ||
-                    id == R.id.buttonParentheses ||
-                    id == R.id.buttonBrace) {
-
+            } else {
                 Button btn = findViewById(id);
 
-                // 각각의 버튼마다 별도의 상태 변수 생성
-                final boolean[] isLeft = {true};
+                final String[] symbols;
+                final String defaultText;
 
-                btn.setOnClickListener(v -> {
-                    String symbol = "";
+                if (id == R.id.buttonParentheses) {
+                    symbols = new String[]{"(", ")"};
+                    defaultText = "( )";
+                } else if (id == R.id.buttonBrace) {
+                    symbols = new String[]{"{", "}"};
+                    defaultText = "{ }";
+                } else if (id == R.id.buttonSquareBrackets) {
+                    symbols = new String[]{"[", "]"};
+                    defaultText = "[ ]";
+                } else {
+                    continue; // 이외 버튼은 무시
+                }
 
-                    if (id == R.id.buttonSquareBrackets) {
-                        symbol = isLeft[0] ? "[" : "]";
-                    } else if (id == R.id.buttonParentheses) {
-                        symbol = isLeft[0] ? "(" : ")";
-                    } else if (id == R.id.buttonBrace) {
-                        symbol = isLeft[0] ? "{" : "}";
+                final boolean[] toggle = {true};
+
+                btn.setOnTouchListener((v, event) -> {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            isPressed = true;
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (!isPressed) return;
+                                    btn.setText(toggle[0] ? symbols[0] : symbols[1]);
+                                    toggle[0] = !toggle[0];
+                                    handler.postDelayed(this, 150);
+                                }
+                            });
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            isPressed = false;
+                            handler.removeCallbacksAndMessages(null);
+                            String chosen = toggle[0] ? symbols[1] : symbols[0];
+                            insertSymbol(chosen);
+                            btn.setText(defaultText);
+                            toggle[0] = true;
+
+                            v.performClick(); // 👈 이 줄 추가!
+                            break;
                     }
-
-                    insertSymbol(symbol);
-                    isLeft[0] = !isLeft[0]; // 독립적인 토글
+                    return true;
                 });
             }
         }
+
 
 
         buttonBackspace.setOnClickListener(new View.OnClickListener() {
