@@ -40,6 +40,17 @@ public class MainActivity extends AppCompatActivity {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(this::onButtonClick);
             }
+            else if (id == R.id.buttonSquareBrackets || id == R.id.buttonParentheses || id == R.id.buttonBrace) {
+                Button btn = findViewById(id);
+                btn.setOnClickListener(v -> {
+                    String label = ((Button) v).getText().toString();
+                    if (label.equals("(") || label.equals(")") ||
+                            label.equals("[") || label.equals("]") ||
+                            label.equals("{") || label.equals("}")) {
+                        insertSymbol(label);
+                    }
+                });
+            }
         }
 
         buttonBackspace.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private String calculateExpression(String expression) {
         try {
             // Python 스타일 연산자들 변환
@@ -107,4 +117,11 @@ public class MainActivity extends AppCompatActivity {
             return "오류";
         }
     }
+
+    private void insertSymbol(String symbol) {
+        int cursorPos = inputExpression.length();
+        inputExpression.insert(cursorPos, symbol);
+        calcTextView.setText(inputExpression.toString());
+    }
+
 }
