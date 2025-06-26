@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
 
-            return result.toString();
+            return "{" + String.join(", ", result) + "}";
         } catch (Exception e) {
             return "집합 오류";
         }
