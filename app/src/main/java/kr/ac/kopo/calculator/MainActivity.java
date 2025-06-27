@@ -243,11 +243,7 @@ public class MainActivity extends AppCompatActivity {
                     sets.add(set);
                 }
             }
-
-            // ✅ 디버그 출력 (필요 시 활성화)
-            // System.out.println("sets = " + sets);
-            // System.out.println("operators = " + operators);
-
+            
             if (sets.isEmpty()) {
                 return "형식 오류: 집합이 하나도 인식되지 않았습니다.";
             }
