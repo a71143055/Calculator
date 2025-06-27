@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             expr = expr.replaceAll("\\s", ""); // 공백 제거
 
-            Matcher m = Pattern.compile("(\\{[^{}]*})|([\\|&\\-])").matcher(expr);
+            Matcher m = Pattern.compile("(\\{[^{}]*})|([|&\\-])").matcher(expr);
             List<Set<String>> sets = new ArrayList<>();
             List<String> operators = new ArrayList<>();
 
