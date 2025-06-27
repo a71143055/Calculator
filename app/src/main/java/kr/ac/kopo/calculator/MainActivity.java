@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             id != R.id.buttonPi && id != R.id.buttonSquareBrackets && id != R.id.buttonParentheses && id != R.id.buttonBrace) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(this::onButtonClick);
-            }else if (id == R.id.buttonSquareBrackets) {
+            } else if (id == R.id.buttonSquareBrackets) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(v -> insertSymbol("[")); // 또는 "]"
                 btn.setOnLongClickListener(v -> {
@@ -223,35 +223,51 @@ public class MainActivity extends AppCompatActivity {
 
     private String evaluateSet(String expr) {
         try {
-            String operator = null;
-            int opIndex = -1;
+            expr = expr.replaceAll("\\s", ""); // 공백 제거
 
-            if ((opIndex = expr.indexOf("|")) != -1) operator = "|";
-            else if ((opIndex = expr.indexOf("&")) != -1) operator = "&";
-            else if ((opIndex = expr.indexOf("-")) != -1) operator = "-";
+            // 집합과 연산자를 정규식으로 추출
+            Matcher m = Pattern.compile("(\\{[^{}]*})|([\\|&\\-])").matcher(expr);
+            List<Set<String>> sets = new ArrayList<>();
+            List<String> operators = new ArrayList<>();
 
-            if (operator == null) return "지원하지 않는 연산";
+            while (m.find()) {
+                String token = m.group();
 
-            String left = expr.substring(0, opIndex).trim();
-            String right = expr.substring(opIndex + 1).trim();
-
-            Set<String> A = new LinkedHashSet<>(Arrays.asList(left.replaceAll("[{}\\s]", "").split(",")));
-            Set<String> B = new LinkedHashSet<>(Arrays.asList(right.replaceAll("[{}\\s]", "").split(",")));
-
-            Set<String> result = new LinkedHashSet<>(A); // 순서 유지
-
-            switch (operator) {
-                case "|": result.addAll(B); break;           // 합집합
-                case "&": result.retainAll(B); break;        // 교집합
-                case "-": result.removeAll(B); break;        // 차집합
+                if (token.equals("|") || token.equals("&") || token.equals("-")) {
+                    operators.add(token);
+                } else {
+                    String[] elements = token.replaceAll("[{}]", "").split(",");
+                    Set<String> set = new LinkedHashSet<>();
+                    for (String e : elements) {
+                        if (!e.trim().isEmpty()) set.add(e.trim());
+                    }
+                    sets.add(set);
+                }
             }
 
-            return "{" + String.join(", ", result) + "}";
+            if (sets.size() < 2 || sets.size() != operators.size() + 1) {
+                return "형식 오류: 연산자 개수와 집합 개수가 일치하지 않습니다.";
+            }
+
+            Set<String> result = new LinkedHashSet<>(sets.get(0));
+            for (int i = 0; i < operators.size(); i++) {
+                Set<String> next = sets.get(i + 1);
+                switch (operators.get(i)) {
+                    case "|": result.addAll(next); break;
+                    case "&": result.retainAll(next); break;
+                    case "-": result.removeAll(next); break;
+                    default: return "지원하지 않는 연산자입니다.";
+                }
+            }
+
+            return result.isEmpty() ? "∅" : "{" + String.join(", ", result) + "}";
 
         } catch (Exception e) {
-            return "집합 오류";
+            e.printStackTrace(); // 디버깅 로그
+            return "집합 오류: " + e.getMessage();
         }
     }
+
 
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
