@@ -225,7 +225,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             expr = expr.replaceAll("\\s", ""); // 공백 제거
 
-            Matcher m = Pattern.compile("(\\{[^{}]*})|([|&\\-])").matcher(expr);
+            // 집합과 연산자를 정규식으로 추출
+            Matcher m = Pattern.compile("(\\{[^{}]*})|([\\|&\\-])").matcher(expr);
             List<Set<String>> sets = new ArrayList<>();
             List<String> operators = new ArrayList<>();
 
@@ -244,39 +245,28 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            if (sets.isEmpty()) {
-                return "형식 오류: 집합이 하나도 인식되지 않았습니다.";
-            }
-
-            if (sets.size() != operators.size() + 1) {
-                return "형식 오류: 연산자 개수(" + operators.size() + ")와 집합 개수(" + sets.size() + ")가 일치하지 않습니다.";
+            if (sets.size() < 2 || sets.size() != operators.size() + 1) {
+                return "형식 오류: 연산자 개수와 집합 개수가 일치하지 않습니다.";
             }
 
             Set<String> result = new LinkedHashSet<>(sets.get(0));
             for (int i = 0; i < operators.size(); i++) {
                 Set<String> next = sets.get(i + 1);
-                String op = operators.get(i);
-
-                if (next == null || op == null) {
-                    return "형식 오류: 계산 중 연산 항목이 비어 있습니다.";
-                }
-
-                switch (op) {
+                switch (operators.get(i)) {
                     case "|": result.addAll(next); break;
                     case "&": result.retainAll(next); break;
                     case "-": result.removeAll(next); break;
-                    default: return "지원하지 않는 연산자: " + op;
+                    default: return "지원하지 않는 연산자입니다.";
                 }
             }
 
             return result.isEmpty() ? "∅" : "{" + String.join(", ", result) + "}";
 
         } catch (Exception e) {
-            e.printStackTrace(); // 콘솔 로그 확인용
-            return "집합 오류: " + e.getClass().getSimpleName() + " - " + e.getMessage();
+            e.printStackTrace(); // 디버깅 로그
+            return "집합 오류: " + e.getMessage();
         }
     }
-
 
 
     private void insertSymbol(String symbol) {
