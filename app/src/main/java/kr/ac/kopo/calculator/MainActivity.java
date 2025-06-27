@@ -225,63 +225,41 @@ public class MainActivity extends AppCompatActivity {
         return matrix; // double[][]
     }
 
+
+
+
+
     private String evaluateSet(String expr) {
         try {
-            expr = expr.replaceAll("\\s", ""); // 공백 제거
+            String operator = null;
+            int opIndex = -1;
 
-            // 집합 추출 + 연산자 추출
-            List<Set<String>> sets = new ArrayList<>();
-            List<String> operators = new ArrayList<>();
+            if ((opIndex = expr.indexOf("|")) != -1) operator = "|";
+            else if ((opIndex = expr.indexOf("&")) != -1) operator = "&";
+            else if ((opIndex = expr.indexOf("-")) != -1) operator = "-";
 
-            Matcher m = Pattern.compile("(\\{[^{}]*})|([|&-])").matcher(expr);
-            while (m.find()) {
-                String token = m.group();
+            if (operator == null) return "지원하지 않는 연산";
 
-                if (token.equals("|") || token.equals("&") || token.equals("-")) {
-                    operators.add(token);
-                } else {
-                    String[] elements = token.replaceAll("[{}]", "").split(",");
-                    Set<String> set = new LinkedHashSet<>();
-                    for (String e : elements) {
-                        if (!e.trim().isEmpty()) set.add(e);
-                    }
-                    sets.add(set);
-                }
+            String left = expr.substring(0, opIndex).trim();
+            String right = expr.substring(opIndex + 1).trim();
+
+            Set<String> A = new LinkedHashSet<>(Arrays.asList(left.replaceAll("[{}\\s]", "").split(",")));
+            Set<String> B = new LinkedHashSet<>(Arrays.asList(right.replaceAll("[{}\\s]", "").split(",")));
+
+            Set<String> result = new LinkedHashSet<>(A); // 순서 유지
+
+            switch (operator) {
+                case "|": result.addAll(B); break;           // 합집합
+                case "&": result.retainAll(B); break;        // 교집합
+                case "-": result.removeAll(B); break;        // 차집합
             }
-
-            if (sets.size() < 2 || sets.size() != operators.size() + 1) {
-                return "형식 오류: 연산자 개수와 집합 개수가 일치하지 않습니다.";
-            }
-
-            Set<String> result = new LinkedHashSet<>(sets.get(0));
-
-            for (int i = 0; i < operators.size(); i++) {
-                Set<String> next = sets.get(i + 1);
-                switch (operators.get(i)) {
-                    case "|": result.addAll(next); break;
-                    case "&": result.retainAll(next); break;
-                    case "-": result.removeAll(next); break;
-                    default: return "지원하지 않는 연산자입니다.";
-                }
-            }
-
-            // 결과 출력 (공집합이면 ∅, 그 외에는 정렬된 형태)
-            if (result.isEmpty()) return "∅";
-
-            // 정렬하고 싶다면 아래 두 줄 활성화:
-            // List<String> sorted = new ArrayList<>(result);
-            // Collections.sort(sorted);
-            // return "{" + String.join(", ", sorted) + "}";
 
             return "{" + String.join(", ", result) + "}";
 
         } catch (Exception e) {
-            e.printStackTrace(); // 디버깅을 위한 로그
-            return "집합 오류: " + e.getMessage();
+            return "집합 오류";
         }
     }
-
-
 
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
