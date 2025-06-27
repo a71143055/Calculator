@@ -225,10 +225,6 @@ public class MainActivity extends AppCompatActivity {
         return matrix; // double[][]
     }
 
-
-
-
-
     private String evaluateSet(String expr) {
         try {
             String operator = null;
