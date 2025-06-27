@@ -192,10 +192,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
     private Object parseMatrix(String input) {
         input = input.trim().replaceAll("\\s", ""); // 공백 제거
 
