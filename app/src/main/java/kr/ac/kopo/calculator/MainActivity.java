@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
                         return "지원하지 않는 연산자입니다.";
                 }
             }
-            return result.isEmpty() ? "∅" : "{" + String.join(", ", result) + "}";
+            return result.isEmpty() ? "∅" : String.join(", ", result);
 
         } catch (Exception e) {
             return "집합 오류";
