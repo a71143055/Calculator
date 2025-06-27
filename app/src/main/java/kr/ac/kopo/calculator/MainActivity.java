@@ -268,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
         inputExpression.insert(cursorPos, symbol);
