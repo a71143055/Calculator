@@ -223,50 +223,79 @@ public class MainActivity extends AppCompatActivity {
 
     private String evaluateSet(String expr) {
         try {
-            expr = expr.replaceAll("\\s", ""); // 공백 제거
-
-            // 집합과 연산자를 정규식으로 추출
-            Matcher m = Pattern.compile("(\\{[^{}]*})|([\\|&\\-])").matcher(expr);
             List<Set<String>> sets = new ArrayList<>();
             List<String> operators = new ArrayList<>();
 
+            // 연산자와 집합 파싱
+            Matcher m = Pattern.compile("(\\{[^{}]*})|([|&\\-])").matcher(expr.replaceAll("\\s", ""));
             while (m.find()) {
                 String token = m.group();
-
                 if (token.equals("|") || token.equals("&") || token.equals("-")) {
                     operators.add(token);
                 } else {
-                    String[] elements = token.replaceAll("[{}]", "").split(",");
-                    Set<String> set = new LinkedHashSet<>();
-                    for (String e : elements) {
-                        if (!e.trim().isEmpty()) set.add(e.trim());
-                    }
-                    sets.add(set);
+                    sets.add(parseSet(token));
                 }
             }
 
+            // 피연산자/연산자 수 일치 확인
             if (sets.size() < 2 || sets.size() != operators.size() + 1) {
                 return "형식 오류: 연산자 개수와 집합 개수가 일치하지 않습니다.";
             }
 
+            // 순차 연산 적용
             Set<String> result = new LinkedHashSet<>(sets.get(0));
             for (int i = 0; i < operators.size(); i++) {
                 Set<String> next = sets.get(i + 1);
-                switch (operators.get(i)) {
-                    case "|": result.addAll(next); break;
-                    case "&": result.retainAll(next); break;
-                    case "-": result.removeAll(next); break;
-                    default: return "지원하지 않는 연산자입니다.";
+                String op = operators.get(i);
+
+                switch (op) {
+                    case "|":
+                        result = union(result, next);
+                        break;
+                    case "&":
+                        result = intersection(result, next);
+                        break;
+                    case "-":
+                        result = difference(result, next);
+                        break;
+                    default:
+                        return "지원하지 않는 연산자입니다.";
                 }
             }
-
             return result.isEmpty() ? "∅" : "{" + String.join(", ", result) + "}";
 
         } catch (Exception e) {
-            e.printStackTrace(); // 디버깅 로그
-            return "집합 오류: " + e.getMessage();
+            return "집합 오류";
         }
     }
+
+    private Set<String> parseSet(String s) {
+        Set<String> set = new LinkedHashSet<>();
+        String[] elements = s.replaceAll("[{}]", "").split(",");
+        for (String e : elements) {
+            if (!e.trim().isEmpty()) set.add(e.trim());
+        }
+        return set;
+    }
+
+    private Set<String> union(Set<String> a, Set<String> b) {
+        Set<String> result = new LinkedHashSet<>(a);
+        result.addAll(b);
+        return result;
+    }
+
+    private Set<String> intersection(Set<String> a, Set<String> b) {
+        Set<String> result = new LinkedHashSet<>(a);
+        result.retainAll(b);
+        return result;
+    }
+
+    private Set<String> difference(Set<String> a, Set<String> b) {
+        Set<String> result = new LinkedHashSet<>(a);
+        result.removeAll(b);
+        return result;
+    }
+
 
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
