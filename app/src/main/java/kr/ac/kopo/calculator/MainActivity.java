@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
                     sets.add(set);
                 }
             }
-            
+
             if (sets.isEmpty()) {
                 return "형식 오류: 집합이 하나도 인식되지 않았습니다.";
             }
