@@ -38,14 +38,11 @@ public class MainActivity extends AppCompatActivity {
                 R.id.button8, R.id.button9, R.id.buttonDot, R.id.buttonAdd,
                 R.id.buttonSubtract, R.id.buttonMultiply, R.id.buttonDivide,
                 R.id.buttonEquals, R.id.buttonComma, R.id.buttonBackspace,
-                R.id.buttonPipe, R.id.buttonRecord, R.id.buttonAnd,
-                R.id.buttonSquareBrackets, R.id.buttonPercent, R.id.buttonBrace,
-                R.id.buttonPi, R.id.buttonParentheses, R.id.buttonColon
+                R.id.buttonSquareBrackets, R.id.buttonPercent, R.id.buttonParentheses
         };
 
         for (int id : buttonIds) {
-            if (id != R.id.buttonBackspace && id != R.id.buttonRecord &&
-            id != R.id.buttonPi && id != R.id.buttonSquareBrackets && id != R.id.buttonParentheses && id != R.id.buttonBrace) {
+            if (id != R.id.buttonBackspace && id != R.id.buttonSquareBrackets && id != R.id.buttonParentheses ) {
                 Button btn = findViewById(id);
                 btn.setOnClickListener(this::onButtonClick);
             } else if (id == R.id.buttonSquareBrackets) {
@@ -60,13 +57,6 @@ public class MainActivity extends AppCompatActivity {
                 btn.setOnClickListener(v -> insertSymbol("(")); // 또는 ")"
                 btn.setOnLongClickListener(v -> {
                     insertSymbol(")"); // 길게 누르면 오른쪽 괄호
-                    return true; // 이벤트 소비
-                });
-            } else if (id == R.id.buttonBrace) {
-                Button btn = findViewById(id);
-                btn.setOnClickListener(v -> insertSymbol("{")); // 또는 "}"
-                btn.setOnLongClickListener(v -> {
-                    insertSymbol("}"); // 길게 누르면 오른쪽 괄호
                     return true; // 이벤트 소비
                 });
             }
@@ -116,11 +106,6 @@ public class MainActivity extends AppCompatActivity {
             // 행렬 연산 감지
             if (expression.startsWith("[") && expression.endsWith("]")) {
                 return evaluateMatrix(expression);
-            }
-
-            // 집합 연산 감지
-            if (expression.startsWith("{") && expression.endsWith("}")) {
-                return evaluateSet(expression);
             }
 
             Expression exp = new ExpressionBuilder(expression).build();
@@ -218,115 +203,6 @@ public class MainActivity extends AppCompatActivity {
 
         return matrix; // double[][]
     }
-
-    private String evaluateSet(String expr) {
-        try {
-            List<Set<Object>> sets = new ArrayList<>();
-            List<String> operators = new ArrayList<>();
-
-            String cleanedExpr = expr.replaceAll("\\s", "");
-            Matcher m = Pattern.compile("(\\{[^{}]*})|([|&\\-])").matcher(cleanedExpr);
-
-            while (m.find()) {
-                String token = m.group();
-                if (token.equals("|") || token.equals("&") || token.equals("-")) {
-                    operators.add(token);
-                } else if (token.matches("\\{[^{}]*}")) {
-                    sets.add(parseSet(token)); // 🔁 여기에 타입 인식 파서를 연동
-                } else {
-                    return "형식 오류: 잘못된 집합 표현입니다 → " + token;
-                }
-            }
-
-            if (sets.size() < 2 || sets.size() != operators.size() + 1) {
-                return "형식 오류: 연산자 수와 집합 수가 일치하지 않습니다.";
-            }
-
-            LinkedHashSet<Object> result = new LinkedHashSet<>(sets.get(0));
-            for (int i = 0; i < operators.size(); i++) {
-                Set<Object> next = sets.get(i + 1);
-                String op = operators.get(i);
-
-                switch (op) {
-                    case "|": result = union(result, next); break;
-                    case "&": result = intersection(result, next); break;
-                    case "-": result = difference(result, next); break;
-                    default: return "지원하지 않는 연산자입니다: " + op;
-                }
-            }
-
-            return result.isEmpty()
-                    ? "∅"
-                    : "{" + result.stream().map(Object::toString).collect(Collectors.joining(", ")) + "}";
-
-        } catch (Exception e) {
-            return "집합 오류: " + e.getMessage();
-        }
-    }
-
-
-
-    // 여기에서 문자열로 원소 처리됨!
-    private LinkedHashSet<Object> parseSet(String s) throws Exception {
-        LinkedHashSet<Object> set = new LinkedHashSet<>();
-        if (!s.matches("\\{[^{}]*}")) {
-            throw new Exception("집합 형식이 잘못되었습니다: " + s);
-        }
-
-        // 요소 추출. [1,2], [[1,2],[3,4]] 등의 구조를 오염 없이 분리
-        String[] elements = s.replaceAll("[{}]", "").split("(?<!]),(?=\\[|[^\\[]|$)");
-
-        for (String e : elements) {
-            String trimmed = e.trim();
-            if (!trimmed.isEmpty()) {
-                set.add(parseElement(trimmed));
-            }
-        }
-        return set;
-    }
-
-    private Object parseElement(String token) {
-        try {
-            if (token.matches("-?\\d+(\\.\\d+)?")) {
-                return Double.parseDouble(token);
-            } else if (token.startsWith("[[")) {
-                return parseMatrix(token);
-            } else if (token.startsWith("[")) {
-                return parseMatrix(token);
-            }
-        } catch (Exception e) {
-            // 무시하고 문자열 처리
-        }
-        return token; // 기본은 문자열
-    }
-
-
-    // 합집합: 순서 보존 + 중복 제거
-    private LinkedHashSet<Object> union(Set<Object> a, Set<Object> b) {
-        LinkedHashSet<Object> result = new LinkedHashSet<>();
-        result.addAll(a);
-        result.addAll(b);
-        return result;
-    }
-
-    // 교집합: a의 순서를 유지하며 a∩b 계산
-    private LinkedHashSet<Object> intersection(Set<Object> a, Set<Object> b) {
-        LinkedHashSet<Object> result = new LinkedHashSet<>();
-        for (Object elem : a) {
-            if (b.contains(elem)) result.add(elem);
-        }
-        return result;
-    }
-
-    // 차집합: a - b (a의 순서 유지)
-    private LinkedHashSet<Object> difference(Set<Object> a, Set<Object> b) {
-        LinkedHashSet<Object> result = new LinkedHashSet<>();
-        for (Object elem : a) {
-            if (!b.contains(elem)) result.add(elem);
-        }
-        return result;
-    }
-
 
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
