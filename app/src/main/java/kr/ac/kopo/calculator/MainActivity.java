@@ -278,18 +278,37 @@ public class MainActivity extends AppCompatActivity {
 
     // 여기에서 문자열로 원소 처리됨!
     private Set<Object> parseSet(String s) throws Exception {
-        Set<String> set = new LinkedHashSet<>();
+        Set<Object> set = new LinkedHashSet<>();
         if (!s.matches("\\{[^{}]*}")) {
             throw new Exception("집합 형식이 잘못되었습니다: " + s);
         }
-        String[] elements = s.replaceAll("[{}]", "").split(",");
+
+        String[] elements = s.replaceAll("[{}]", "").split("(?<!]),(?=\\[|[^\\[]|$)");
         for (String e : elements) {
             String trimmed = e.trim();
-            if (!trimmed.isEmpty()) set.add(trimmed);
+            if (trimmed.isEmpty()) continue;
+
+            Object value = parseElement(trimmed);
+            set.add(value);
         }
-        return Collections.singleton(set);
+        return set;
     }
 
+    private Object parseElement(String token) {
+        try {
+            if (token.matches("-?\\d+(\\.\\d+)?")) {
+                return Double.parseDouble(token); // 실수
+            } else if (token.startsWith("[[")) {
+                return parseMatrix(token); // 2차원 행렬
+            } else if (token.startsWith("[")) {
+                return parseMatrix(token); // 1차원 벡터
+            } else {
+                return token; // 일반 문자열
+            }
+        } catch (Exception e) {
+            return token; // 파싱 실패 시 문자열로 간주
+        }
+    }
 
     private LinkedHashSet<Object> union(LinkedHashSet<Object> a, Set<Object> b) {
         LinkedHashSet<Object> result = new LinkedHashSet<>(a);
