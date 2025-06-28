@@ -226,23 +226,31 @@ public class MainActivity extends AppCompatActivity {
             List<Set<String>> sets = new ArrayList<>();
             List<String> operators = new ArrayList<>();
 
-            // 연산자와 집합 파싱
-            Matcher m = Pattern.compile("(\\{[^{}]*})|([|&\\-])").matcher(expr.replaceAll("\\s", ""));
+            // 공백 제거 후 정규식 파싱
+            String cleanedExpr = expr.replaceAll("\\s", "");
+            Matcher m = Pattern.compile("(\\{[^{}]*})|([|&\\-])").matcher(cleanedExpr);
+
             while (m.find()) {
                 String token = m.group();
                 if (token.equals("|") || token.equals("&") || token.equals("-")) {
                     operators.add(token);
+                } else if (token.matches("\\{[^{}]*}")) {
+                    sets.add(parseSet(token));
                 } else {
-                    sets.add(parseSet(token)); // 숫자든 문장이든 문자열로 인식됨
+                    return "형식 오류: 잘못된 집합 표현입니다 → " + token;
                 }
             }
 
-            // 피연산자/연산자 수 일치 확인
+            // 디버깅용 출력
+            System.out.println("✅ sets: " + sets);
+            System.out.println("✅ operators: " + operators);
+
+            // 연산자/집합 수 일치 확인
             if (sets.size() < 2 || sets.size() != operators.size() + 1) {
-                return "형식 오류: 연산자 개수와 집합 개수가 일치하지 않습니다.";
+                return "형식 오류: 연산자 수와 집합 수가 일치하지 않습니다.";
             }
 
-            // 순차 연산 적용
+            // 연산 수행
             Set<String> result = new LinkedHashSet<>(sets.get(0));
             for (int i = 0; i < operators.size(); i++) {
                 Set<String> next = sets.get(i + 1);
@@ -259,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
                         result = difference(result, next);
                         break;
                     default:
-                        return "지원하지 않는 연산자입니다.";
+                        return "지원하지 않는 연산자입니다: " + op;
                 }
             }
 
@@ -270,15 +278,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     // 여기에서 문자열로 원소 처리됨!
-    private Set<String> parseSet(String s) {
+    private Set<String> parseSet(String s) throws Exception {
         Set<String> set = new LinkedHashSet<>();
+        if (!s.matches("\\{[^{}]*}")) {
+            throw new Exception("집합 형식이 잘못되었습니다: " + s);
+        }
         String[] elements = s.replaceAll("[{}]", "").split(",");
         for (String e : elements) {
-            if (!e.trim().isEmpty()) set.add(e.trim()); // "1", "2" 같은 문자열로 저장
+            String trimmed = e.trim();
+            if (!trimmed.isEmpty()) set.add(trimmed);
         }
         return set;
     }
+
 
     private Set<String> union(Set<String> a, Set<String> b) {
         Set<String> result = new LinkedHashSet<>(a);
