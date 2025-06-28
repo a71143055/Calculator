@@ -20,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
     private final StringBuilder inputExpression = new StringBuilder();
     private TextView calcTextView;
     private TextView resultTextView;
-    private Button buttonBackspace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
         calcTextView = findViewById(R.id.calcTextView);
         resultTextView = findViewById(R.id.resultTextView);
-        buttonBackspace = findViewById(R.id.buttonBackspace);
+        Button buttonBackspace = findViewById(R.id.buttonBackspace);
 
         int[] buttonIds = {
                 R.id.button0, R.id.button1, R.id.button2, R.id.button3,
@@ -71,16 +70,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        buttonBackspace.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (inputExpression.length() > 0) {
-                    // 입력값에서 마지막 문자 삭제
-                    inputExpression.deleteCharAt(inputExpression.length() - 1);
+        buttonBackspace.setOnClickListener(v -> {
+            if (inputExpression.length() > 0) {
+                // 입력값에서 마지막 문자 삭제
+                inputExpression.deleteCharAt(inputExpression.length() - 1);
 
-                    // 화면에 표시된 텍스트도 업데이트
-                    calcTextView.setText(inputExpression.toString());
-                }
+                // 화면에 표시된 텍스트도 업데이트
+                calcTextView.setText(inputExpression.toString());
             }
         });
     }
