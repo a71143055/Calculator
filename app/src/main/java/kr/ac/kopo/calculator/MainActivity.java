@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
     private final StringBuilder inputExpression = new StringBuilder();
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             expression = expression.replace("//", "/");   // 정수 나눗셈은 일반 나눗셈으로 처리
 
             // 행렬 연산 감지
-            if (expression.startsWith("[[") && expression.endsWith("]]")) {
+            if (expression.startsWith("[") && expression.endsWith("]")) {
                 return evaluateMatrix(expression);
             }
 
@@ -223,7 +224,6 @@ public class MainActivity extends AppCompatActivity {
             List<Set<Object>> sets = new ArrayList<>();
             List<String> operators = new ArrayList<>();
 
-            // 공백 제거 후 정규식 파싱
             String cleanedExpr = expr.replaceAll("\\s", "");
             Matcher m = Pattern.compile("(\\{[^{}]*})|([|&\\-])").matcher(cleanedExpr);
 
@@ -232,48 +232,38 @@ public class MainActivity extends AppCompatActivity {
                 if (token.equals("|") || token.equals("&") || token.equals("-")) {
                     operators.add(token);
                 } else if (token.matches("\\{[^{}]*}")) {
-                    sets.add(parseSet(token));
+                    sets.add(parseSet(token)); // 🔁 여기에 타입 인식 파서를 연동
                 } else {
                     return "형식 오류: 잘못된 집합 표현입니다 → " + token;
                 }
             }
 
-            // 디버깅용 출력
-            System.out.println("✅ sets: " + sets);
-            System.out.println("✅ operators: " + operators);
-
-            // 연산자/집합 수 일치 확인
             if (sets.size() < 2 || sets.size() != operators.size() + 1) {
                 return "형식 오류: 연산자 수와 집합 수가 일치하지 않습니다.";
             }
 
-            // 연산 수행
             LinkedHashSet<Object> result = new LinkedHashSet<>(sets.get(0));
             for (int i = 0; i < operators.size(); i++) {
                 Set<Object> next = sets.get(i + 1);
                 String op = operators.get(i);
 
                 switch (op) {
-                    case "|":
-                        result = union(result, next);
-                        break;
-                    case "&":
-                        result = intersection(result, next);
-                        break;
-                    case "-":
-                        result = difference(result, next);
-                        break;
-                    default:
-                        return "지원하지 않는 연산자입니다: " + op;
+                    case "|": result = union(result, next); break;
+                    case "&": result = intersection(result, next); break;
+                    case "-": result = difference(result, next); break;
+                    default: return "지원하지 않는 연산자입니다: " + op;
                 }
             }
 
-            return result.isEmpty() ? "∅" : "{" + String.join((CharSequence) ", ", (CharSequence) result) + "}";
+            return result.isEmpty()
+                    ? "∅"
+                    : "{" + result.stream().map(Object::toString).collect(Collectors.joining(", ")) + "}";
 
         } catch (Exception e) {
             return "집합 오류: " + e.getMessage();
         }
     }
+
 
 
     // 여기에서 문자열로 원소 처리됨!
@@ -282,32 +272,61 @@ public class MainActivity extends AppCompatActivity {
         if (!s.matches("\\{[^{}]*}")) {
             throw new Exception("집합 형식이 잘못되었습니다: " + s);
         }
-        String[] elements = s.replaceAll("[{}]", "").split(",");
+
+        // 요소 추출. [1,2], [[1,2],[3,4]] 등의 구조를 오염 없이 분리
+        String[] elements = s.replaceAll("[{}]", "").split("(?<!]),(?=\\[|[^\\[]|$)");
+
         for (String e : elements) {
             String trimmed = e.trim();
-            if (!trimmed.isEmpty()) set.add(trimmed);
+            if (!trimmed.isEmpty()) {
+                set.add(parseElement(trimmed));
+            }
         }
         return set;
     }
 
+    private Object parseElement(String token) {
+        try {
+            if (token.matches("-?\\d+(\\.\\d+)?")) {
+                return Double.parseDouble(token);
+            } else if (token.startsWith("[[")) {
+                return parseMatrix(token);
+            } else if (token.startsWith("[")) {
+                return parseMatrix(token);
+            }
+        } catch (Exception e) {
+            // 무시하고 문자열 처리
+        }
+        return token; // 기본은 문자열
+    }
 
-    private LinkedHashSet<Object> union(LinkedHashSet<Object> a, Set<Object> b) {
-        LinkedHashSet<Object> result = new LinkedHashSet<>(a);
+
+    // 합집합: 순서 보존 + 중복 제거
+    private LinkedHashSet<Object> union(Set<Object> a, Set<Object> b) {
+        LinkedHashSet<Object> result = new LinkedHashSet<>();
+        result.addAll(a);
         result.addAll(b);
         return result;
     }
 
-    private LinkedHashSet<Object> intersection(LinkedHashSet<Object> a, Set<Object> b) {
-        LinkedHashSet<Object> result = new LinkedHashSet<>(a);
-        result.retainAll(b);
+    // 교집합: a의 순서를 유지하며 a∩b 계산
+    private LinkedHashSet<Object> intersection(Set<Object> a, Set<Object> b) {
+        LinkedHashSet<Object> result = new LinkedHashSet<>();
+        for (Object elem : a) {
+            if (b.contains(elem)) result.add(elem);
+        }
         return result;
     }
 
-    private LinkedHashSet<Object> difference(LinkedHashSet<Object> a, Set<Object> b) {
-        LinkedHashSet<Object> result = new LinkedHashSet<>(a);
-        result.removeAll(b);
+    // 차집합: a - b (a의 순서 유지)
+    private LinkedHashSet<Object> difference(Set<Object> a, Set<Object> b) {
+        LinkedHashSet<Object> result = new LinkedHashSet<>();
+        for (Object elem : a) {
+            if (!b.contains(elem)) result.add(elem);
+        }
         return result;
     }
+
 
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
