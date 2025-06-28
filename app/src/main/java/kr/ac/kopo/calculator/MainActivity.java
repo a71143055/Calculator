@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
                 if (token.equals("|") || token.equals("&") || token.equals("-")) {
                     operators.add(token);
                 } else {
-                    sets.add(parseSet(token));
+                    sets.add(parseSet(token)); // 숫자든 문장이든 문자열로 인식됨
                 }
             }
 
@@ -262,18 +262,20 @@ public class MainActivity extends AppCompatActivity {
                         return "지원하지 않는 연산자입니다.";
                 }
             }
+
             return result.isEmpty() ? "∅" : "{" + String.join(", ", result) + "}";
 
         } catch (Exception e) {
-            return "집합 오류";
+            return "집합 오류: " + e.getMessage();
         }
     }
 
+    // 여기에서 문자열로 원소 처리됨!
     private Set<String> parseSet(String s) {
         Set<String> set = new LinkedHashSet<>();
         String[] elements = s.replaceAll("[{}]", "").split(",");
         for (String e : elements) {
-            if (!e.trim().isEmpty()) set.add(e.trim());
+            if (!e.trim().isEmpty()) set.add(e.trim()); // "1", "2" 같은 문자열로 저장
         }
         return set;
     }
@@ -296,11 +298,9 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
-
     private void insertSymbol(String symbol) {
         int cursorPos = inputExpression.length();
         inputExpression.insert(cursorPos, symbol);
         calcTextView.setText(inputExpression.toString());
     }
-
 }
