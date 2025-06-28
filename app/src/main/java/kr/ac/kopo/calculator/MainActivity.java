@@ -9,6 +9,7 @@ import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -219,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String evaluateSet(String expr) {
         try {
-            List<Set<String>> sets = new ArrayList<>();
+            List<Set<Object>> sets = new ArrayList<>();
             List<String> operators = new ArrayList<>();
 
             // 공백 제거 후 정규식 파싱
@@ -247,9 +248,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // 연산 수행
-            Set<String> result = new LinkedHashSet<>(sets.get(0));
+            LinkedHashSet<Object> result = new LinkedHashSet<>(sets.get(0));
             for (int i = 0; i < operators.size(); i++) {
-                Set<String> next = sets.get(i + 1);
+                Set<Object> next = sets.get(i + 1);
                 String op = operators.get(i);
 
                 switch (op) {
@@ -267,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            return result.isEmpty() ? "∅" : "{" + String.join(", ", result) + "}";
+            return result.isEmpty() ? "∅" : "{" + String.join((CharSequence) ", ", (CharSequence) result) + "}";
 
         } catch (Exception e) {
             return "집합 오류: " + e.getMessage();
@@ -276,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // 여기에서 문자열로 원소 처리됨!
-    private Set<String> parseSet(String s) throws Exception {
+    private Set<Object> parseSet(String s) throws Exception {
         Set<String> set = new LinkedHashSet<>();
         if (!s.matches("\\{[^{}]*}")) {
             throw new Exception("집합 형식이 잘못되었습니다: " + s);
@@ -286,24 +287,24 @@ public class MainActivity extends AppCompatActivity {
             String trimmed = e.trim();
             if (!trimmed.isEmpty()) set.add(trimmed);
         }
-        return set;
+        return Collections.singleton(set);
     }
 
 
-    private Set<String> union(Set<String> a, Set<String> b) {
-        Set<String> result = new LinkedHashSet<>(a);
+    private LinkedHashSet<Object> union(LinkedHashSet<Object> a, Set<Object> b) {
+        LinkedHashSet<Object> result = new LinkedHashSet<>(a);
         result.addAll(b);
         return result;
     }
 
-    private Set<String> intersection(Set<String> a, Set<String> b) {
-        Set<String> result = new LinkedHashSet<>(a);
+    private LinkedHashSet<Object> intersection(LinkedHashSet<Object> a, Set<Object> b) {
+        LinkedHashSet<Object> result = new LinkedHashSet<>(a);
         result.retainAll(b);
         return result;
     }
 
-    private Set<String> difference(Set<String> a, Set<String> b) {
-        Set<String> result = new LinkedHashSet<>(a);
+    private LinkedHashSet<Object> difference(LinkedHashSet<Object> a, Set<Object> b) {
+        LinkedHashSet<Object> result = new LinkedHashSet<>(a);
         result.removeAll(b);
         return result;
     }
